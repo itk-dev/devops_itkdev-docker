@@ -21,6 +21,9 @@ fi
 if [ ! -z "${PHP_MAILHOG_ENABLE}" ]; then
   echo "sendmail_path = '/usr/local/bin/mhsendmail --smtp-addr=\"${PHP_MAILHOG_SERVER}:${PHP_MAILHOG_PORT}\"'" >> ${PHP_INI_DIR}/../php-fpm.d/zz-fpm-docker.conf
   echo "sendmail_path = '/usr/local/bin/mhsendmail --smtp-addr=\"${PHP_MAILHOG_SERVER}:${PHP_MAILHOG_PORT}\"'" >> ${PHP_INI_DIR}/conf.d/20-php.ini
+else
+  echo "sendmail_path = '/usr/sbin/sendmail -S host.docker.internal -t -i'" >> ${PHP_INI_DIR}/../php-fpm.d/zz-fpm-docker.conf
+  echo "sendmail_path = '/usr/sbin/sendmail -S host.docker.internal -t -i'" >> ${PHP_INI_DIR}/conf.d/20-php.ini
 fi
 
 ## Start the php FPM process.
