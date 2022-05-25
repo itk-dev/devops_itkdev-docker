@@ -39,6 +39,11 @@ RUN apk --update add --no-cache \
         zlib \
         patch \
         tzdata \
+        freetype-dev \
+        libjpeg-turbo-dev \
+        libjpeg-turbo \
+        libpng-dev \
+    && docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ --with-freetype-dir=/usr/include/ \
     && docker-php-ext-install -j$(nproc) \
         bcmath \
         gd \
@@ -87,7 +92,11 @@ RUN chmod +x /usr/local/bin/mhsendmail
 
 # Add deploy use to match server.
 RUN addgroup -g 1001 deploy \
-&& adduser -G deploy -u 1001 -H deploy -D
+&& adduser -G deploy -u 1001 -h /home/deploy -D deploy
+
+# Add git global config
+COPY gitconfig /home/deploy/.gitconfig
+RUN chown deploy:deploy /home/deploy/.gitconfig
 
 EXPOSE 9000
 
