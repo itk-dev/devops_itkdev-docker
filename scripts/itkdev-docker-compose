@@ -278,6 +278,39 @@ if [[ "$#" -gt "0" && "$1" == "nfs:enable" ]]; then
   exit
 fi
 
+# Allow traefik:start without existence of .env
+if [[ "$#" -gt "0" && "$1" == "traefik:start" ]]; then
+  if [ "$(docker inspect -f '{{.State.Running}}' dory_dnsmasq 2>/dev/null)" == "true" ]; then
+    (>&2 echo "${bold}Dory reverse proxy should be stopped first. Run itkdev-docker-compose dory:stop.${normal}")
+    exit 22;
+  fi
+  docker network inspect frontend >/dev/null 2>&1 || docker network create --driver=bridge --attachable --internal=false frontend
+  $(cd ${script_dir}/../traefik/; docker-compose up -d)
+  exit
+fi
+
+# Allow traefik:stop without existence of .env
+if [[ "$#" -gt "0" && "$1" == "traefik:stop" ]]; then
+  $(cd ${script_dir}/../traefik/; docker-compose down --volumes)
+  exit
+fi
+
+# Allow dory:start without existence of .env
+if [[ "$#" -gt "0" && "$1" == "dory:start" ]]; then
+  if [ "$(docker inspect -f '{{.State.Running}}' traefik 2>/dev/null)" == "true" ]; then
+    (>&2 echo "${bold}Traefik reverse proxy should be stopped first. Run itkdev-docker-compose traefik:stop.${normal}")
+    exit 22;
+  fi
+  dory up
+  exit
+fi
+
+# Allow dory:start without existence of .env
+if [[ "$#" -gt "0" && "$1" == "dory:stop" ]]; then
+  dory down
+  exit
+fi
+
 # Allow version without existence of docker-compose.yml.
 if [[ "$#" -gt "0" && "$1" == "version" ]]; then
   echo Version: ${VERSION}
@@ -353,18 +386,6 @@ cmd="$1"
 shift
 
 case "$cmd" in
-  dory:start)
-    if [ "$(docker inspect -f '{{.State.Running}}' traefik 2>/dev/null)" == "true" ]; then
-      (>&2 echo "${bold}Traefik reverse proxy should be stopped first. Run itkdev-docker-compose traefik:stop.${normal}")
-      exit 22;
-    fi
-    dory up
-    ;;
-
-  dory:stop)
-    dory down
-    ;;
-
   url)
     domain=${COMPOSE_DOMAIN}
     if [ "$#" -gt 0 ]; then
@@ -470,19 +491,6 @@ EOF
 
   sql:port)
     docker_compose port mariadb 3306 | cut -d: -f2
-    ;;
-
-  traefik:start)
-    if [ "$(docker inspect -f '{{.State.Running}}' dory_dnsmasq 2>/dev/null)" == "true" ]; then
-      (>&2 echo "${bold}Dory reverse proxy should be stopped first. Run itkdev-docker-compose dory:stop.${normal}")
-      exit 22;
-    fi
-    docker network inspect frontend >/dev/null 2>&1 || docker network create --driver=bridge --attachable --internal=false frontend
-    $(cd ${script_dir}/../traefik/; docker-compose up -d)
-    ;;
-
-  traefik:stop)
-    $(cd ${script_dir}/../traefik/; docker-compose down --volumes)
     ;;
 
   traefik:open)
