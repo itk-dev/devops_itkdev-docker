@@ -48,6 +48,7 @@ RUN apk --update add --no-cache \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         bcmath \
+        calendar \
         gd \
         gettext \
         intl \
