@@ -13,13 +13,6 @@ Mac](https://docs.docker.com/docker-for-mac/install/) and create account at
 
 ## Optimisations
 
-There are some simple tricks that makes docker perform better on Mac's. Open the
-docker preferences in the via the dock icon.
-
-* File Sharing (Only set path where you have your source code)
-* Disk (Ensure the file has type `raw`)
-* Advanced (CPU's, Memory)
-
 From version 2.x this tool supports the usage of NFS mounted name-volumes, which
 gives faster file synchronisation during composer install and cache clear etc.
 
@@ -175,15 +168,5 @@ At ITK-dev we have created docker images that matches our development.
 The fuld list can be found at
 [https://hub.docker.com/search?q=itkdev&type=image](https://hub.docker.com/search?q=itkdev&type=image).
 
-### How to build
-
-Please remember that changes to these images that are pushed to docker hub will
-effect all development projects. So changes should be coordinated with the
-development team.
-
-```sh
-docker build --tag=itkdev/php7.2-fpm .
-docker push itkdev/php7.2-fpm
-```
-
-# !!!! Don't use iPhone hotspot. It wrecks everything, costs hours of debugging and ruins your day !!!!
+## More
+For more details about usage see https://docs.itkdev.dk
