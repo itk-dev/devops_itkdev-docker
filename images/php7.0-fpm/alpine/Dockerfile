@@ -68,6 +68,13 @@ RUN apk --update add --no-cache --virtual .build-deps autoconf g++ make zlib-dev
     && docker-php-ext-enable redis memcached \
     && apk del .build-deps
 
+# Install AMQP support
+RUN apk --update add --no-cache rabbitmq-c
+RUN apk --update add --no-cache --virtual .build-deps autoconf g++ make rabbitmq-c-dev \
+    && pecl install amqp \
+    && docker-php-ext-enable amqp memcached \
+    && apk del .build-deps
+
 # Install composer (both composer version as set symlink to right version in entry-point)
 COPY --from=composer:1 /usr/bin/composer /usr/bin/composer1
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer2
