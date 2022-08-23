@@ -1,0 +1,637 @@
+#!/usr/bin/env bash
+VERSION=2.0.0
+set -o errexit -o errtrace -o noclobber -o nounset -o pipefail
+IFS=$'\n\t'
+
+function find_script_dir {
+  local script=${BASH_SOURCE[0]}
+  local script_dir=$(cd $(dirname "${script}") && pwd)
+  if [ -L $script ]; then
+    # Symlink detected.
+    script_dir=$(dirname $(readlink $script));
+  fi
+
+  echo $script_dir
+}
+
+script_dir=$(find_script_dir)
+script_path=$script_dir/$(basename "${BASH_SOURCE[0]}")
+
+function template_install {
+  local force=0
+  local list=0
+  local name=""
+
+  for var in "$@"
+  do
+    case "$var" in
+      --force)
+        force=1
+        ;;
+      --list)
+        list=1
+        ;;
+      *)
+        name="$var"
+        ;;
+    esac
+  done
+
+  local templates_dir=$script_dir/../templates
+  local source_dir=$templates_dir/$name/
+  local target_dir=$PWD
+
+  if [ "$list" -eq 1 ]; then
+    echo Templates:
+    for name in $templates_dir/*; do
+      echo "  $(basename $name)"
+    done
+    exit 0
+  fi
+
+  if [ -z "$name" ]; then
+    (>&2 echo "${bold}Missing template name${normal}")
+    exit 1
+  fi
+  if [ ! -d $source_dir ]; then
+    (>&2 echo "${bold}Invalid template name: $name (use --list to show valid template names)${normal}")
+    exit 1
+  fi
+
+  if [ "$force" -ne 1 ]; then
+    if [ -e $target_dir/docker-compose.yml ]; then
+      (>&2 echo "${bold}Target $target_dir/docker-compose.yml already exists (use --force to overwrite)${normal}")
+      exit 1
+    fi
+    if [ -e $target_dir/.docker ]; then
+      (>&2 echo "${bold}Target $target_dir/.docker already exists (use --force to overwrite)${normal}")
+      exit 1
+    fi
+  fi
+
+  read -p "Are you sure you want to install the $name template in $target_dir (y|N)? " -n 1 -r
+  echo
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+     exit
+  fi
+
+  echo "${bold}Installing $name template${normal}"
+  rsync --archive $source_dir $target_dir
+
+  local project_name_default=$(basename $target_dir)
+
+  # Help user set up a .env file
+  if [ ! -e $target_dir/.env ]; then
+    local project_name
+    local domain
+    read -p "Project name ($project_name_default)? " -e project_name
+    if [ -z "$project_name" ]; then
+      project_name=$project_name_default
+    fi
+    read -p "Domain (optional)? " -e domain
+    cat > $target_dir/.env <<EOF
+COMPOSE_PROJECT_NAME=$project_name
+COMPOSE_DOMAIN=$domain
+EOF
+  else
+cat <<EOF
+
+${bold}Edit .env and make sure that COMPOSE_PROJECT_NAME and, optionally, COMPOSE_DOMAIN is set${normal}, e.g.
+
+COMPOSE_PROJECT_NAME=$project_name_default
+COMPOSE_DOMAIN=$project_name_default.local.itkdev.dk
+
+EOF
+  fi
+}
+
+function enableNFS {
+  echo "Setting up NFS..."
+  U=`id -u`
+  G=`id -g`
+
+  LINE="/System/Volumes/Data/Users -alldirs -mapall=$U:$G localhost"
+  FILE=/etc/exports
+  sudo touch $FILE
+  grep -qF -- "$LINE" "$FILE" || sudo echo "$LINE" | sudo tee -a $FILE > /dev/null
+
+  LINE="nfs.server.mount.require_resv_port = 0"
+  FILE=/etc/nfs.conf
+  grep -qF -- "$LINE" "$FILE" || sudo echo "$LINE" | sudo tee -a $FILE > /dev/null
+
+  echo "Restarting nfsd..."
+  sudo nfsd restart
+
+  echo "You should restart docker to ensure NFS mounts works..."
+}
+
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+function usage {
+  cat <<'EOF'
+Usage: itkdev-docker-compose command [command arguments]
+
+Commands:
+
+  dory:start
+                Start dory reverse proxy
+
+  dory:stop
+                Stop dory reverse proxy
+
+  url [service [port]]
+                Print url to site or a service
+
+  open [service [port]]
+                Open url in default browser
+
+  drush
+                Run drush command. If drush in installed via composer,
+                the vendor/bin/drush command is run inside the phpfpm
+                container. Otherwise, the drush container is used to
+                run the command.
+
+  nfs:enable
+                Enable support for NFS shares (performance boost on Macs)
+
+  sync
+                Sync both database and files.
+
+  sync:db
+                Sync database base on 'REMOTE_DB_DUMP_CMD' in the env
+                file.
+
+                If 'SYNC_DB_POST_SCRIPT' is set, it will be eval'ed after
+                importing the remote database.
+
+  sync:files
+                Sync files base on 'REMOTE_PATH' or 'LOCAL_PATH' in
+                the env file.
+
+  sql:connect
+                Print mysql command for connecting to database (named
+                `db`) in the database container (`mariadb`).
+
+                Use `$(itkdev-docker-compose sql:connect)` to open the
+                database cli.
+
+  sql:open
+                Open database GUI and connect to MariaDB.
+
+  sql:port
+                Display the exposed MariaDB SQL server port.
+
+  template:install name [--force] [--list]
+                Install a named docker-composer template in the current
+                directory.
+
+  traefik:start
+                Start træfik reverse proxy.
+
+  traefik:stop
+                Stop træfik reverse proxy
+
+  traefik:url
+                URL for the administrative UI for træfik.
+
+  traefik:open
+                Open the administrative UI for træfik.
+
+  mailhog:url
+                URL for the mailhog web-interface.
+
+  mailhog:open
+                Open mailhog url in default browser
+
+  xdebug
+                Boot the containers with PHP xdebug support enabled.
+
+  hosts:insert
+                Insert the docker site url into the hosts file.
+
+  images:pull
+                Update/pull all docker images.
+
+  shell [service name]
+                Enter into /usr/bin/env sh inside container. E.g. itkdev-docker-compose shell phpfpm
+
+  composer
+                Run composer command inside phpfpm container
+
+  bin/*
+  vendor/bin/*
+                Run command command inside phpfpm container
+
+  down
+                Stop and remove containers, networks, images, and volumes
+
+  version
+                Display this tool's current version
+
+  *
+                Pass command and arguments to `docker-compose` and
+                hope for the best.
+
+Configuration:
+
+  The environment variable COMPOSE_PROJECT_NAME must be set in the env file (`.env`).
+
+  These environment variables may be set in the env file:
+
+    COMPOSE_DOMAIN
+                The domain to use when generating urls
+
+    REMOTE_HOST
+                Host used when pulling data from remove site
+
+    REMOTE_DB_DUMP_CMD
+                 Command used to dump database on remote host
+
+    REMOTE_PATH
+                File path on remote host
+
+    REMOTE_EXCLUDE
+                List of rsync exclude patterns to use when pulling files, e.g.
+                REMOTE_EXCLUDE=(ting styles advagg_*)
+
+    LOCAL_PATH
+                Local file path
+
+  Local overrides of these variables can be defined in `.env.local` which should
+  NOT be commited to Git.
+
+EOF
+}
+
+# template:install must be run before we check for existence of
+# docker-compose.yml.
+if [[ "$#" -gt "0" && "$1" == "template:install" ]]; then
+  shift
+  template_install "$@"
+  exit
+fi
+
+# Allow nfs:enable without existence of docker-compose.yml.
+if [[ "$#" -gt "0" && "$1" == "nfs:enable" ]]; then
+  enableNFS
+  exit
+fi
+
+# Allow traefik:start without existence of .env
+if [[ "$#" -gt "0" && "$1" == "traefik:start" ]]; then
+  if [ "$(docker inspect -f '{{.State.Running}}' dory_dnsmasq 2>/dev/null)" == "true" ]; then
+    (>&2 echo "${bold}Dory reverse proxy should be stopped first. Run itkdev-docker-compose dory:stop.${normal}")
+    exit 22;
+  fi
+  docker network inspect frontend >/dev/null 2>&1 || docker network create --driver=bridge --attachable --internal=false frontend
+  $(cd ${script_dir}/../traefik/; docker-compose up -d)
+  exit
+fi
+
+# Allow traefik:stop without existence of .env
+if [[ "$#" -gt "0" && "$1" == "traefik:stop" ]]; then
+  $(cd ${script_dir}/../traefik/; docker-compose down --volumes)
+  exit
+fi
+
+# Allow dory:start without existence of .env
+if [[ "$#" -gt "0" && "$1" == "dory:start" ]]; then
+  if [ "$(docker inspect -f '{{.State.Running}}' traefik 2>/dev/null)" == "true" ]; then
+    (>&2 echo "${bold}Traefik reverse proxy should be stopped first. Run itkdev-docker-compose traefik:stop.${normal}")
+    exit 22;
+  fi
+  dory up
+  exit
+fi
+
+# Allow dory:start without existence of .env
+if [[ "$#" -gt "0" && "$1" == "dory:stop" ]]; then
+  dory down
+  exit
+fi
+
+# Allow version without existence of docker-compose.yml.
+if [[ "$#" -gt "0" && "$1" == "version" ]]; then
+  echo Version: ${VERSION}
+  exit
+fi
+
+# Allow help without existence of docker-compose.yml.
+if [[ "$#" -gt "0" && "$1" == "--help" ]]; then
+  usage
+  exit
+fi
+
+# @see https://unix.stackexchange.com/questions/13464/is-there-a-way-to-find-a-file-in-an-inverse-recursive-search/13474
+upsearch () {
+  slashes=${PWD//[^\/]/}
+  directory="$PWD"
+  for (( n=${#slashes}; n>0; --n ))
+  do
+    test -e "$directory/$1" && echo "$directory/$1" && return
+    directory="$directory/.."
+  done
+}
+
+docker_compose_file=$(upsearch 'docker-compose.yml')
+if [ -z "$docker_compose_file" ]; then
+  (>&2 echo "${bold}Cannot find docker-compose.yml file${normal}")
+  exit 1
+fi
+
+docker_compose_dir=$(cd $(dirname "$docker_compose_file") && pwd)
+dot_env_file="$docker_compose_dir/.env"
+
+if [ -z "$dot_env_file" ]; then
+  (>&2 echo "${bold}$dot_env_file not found${normal}")
+  exit 1
+fi
+
+source $dot_env_file
+if [ -e $dot_env_file.local ]; then
+  source $dot_env_file.local
+fi
+
+if [ -z "${COMPOSE_PROJECT_NAME:-}" ]; then
+  (>&2 echo "${bold}Environment variable COMPOSE_PROJECT_NAME not defined in $dot_env_file${normal}")
+  exit 1
+fi
+
+COMPOSE_DOMAIN=${COMPOSE_DOMAIN:-${COMPOSE_PROJECT_NAME}.docker.localhost}
+
+if [ "$#" == "0" ]; then
+  usage
+  exit 1
+fi
+
+# Check if revers proxy is running and print warning if not.
+set +o errexit
+is_treafik_running=$(docker inspect -f '{{.State.Running}}' traefik 2>/dev/null)
+is_dory_running=$(docker inspect -f '{{.State.Running}}' dory_dnsmasq 2>/dev/null)
+set -o errexit
+
+if [ ! "$is_treafik_running" == "true" ] && [ ! "$is_dory_running" == "true" ]; then
+  (>&2 echo "${bold}Reverse proxy has not been started. Hostname will not be resolved to containers and not all commands will work correctly.${normal}")
+fi
+
+# Helper function to call `docker-compose` in the right context
+docker_compose () {
+    # Note: Apparently, using --project-directory or --file options for `docker-compose` will break use of `$PWD` in
+    # docker-compose.yml. Therefore, we `cd` before running `docker-compose` command.
+    (cd "$docker_compose_dir" && COMPOSE_DOMAIN=${COMPOSE_DOMAIN} docker-compose "$@")
+}
+
+cmd="$1"
+shift
+
+case "$cmd" in
+  url)
+    domain=${COMPOSE_DOMAIN}
+    if [ "$#" -gt 0 ]; then
+      service="$1"
+      port=80
+
+      shift
+      if [ "$#" -gt 0 ]; then
+        port="$1"
+        shift
+      fi
+
+      domain=$(docker_compose port $service $port)
+      if [ $? -ne 0 ]; then
+        exit 1
+      elif [ -z "$domain" ]; then
+        (>&2 echo "Cannot find domain for service $service (port: $port)")
+        exit 1
+      fi
+    fi
+
+    echo http://$domain
+    ;;
+
+  open)
+    open $($script_path url "$@")
+    ;;
+
+  sync)
+    itkdev-docker-compose sync:db
+    itkdev-docker-compose sync:files
+    ;;
+
+  sync:db)
+    if [ -z "${REMOTE_HOST:-}" ]; then
+      (>&2 echo "${bold}Environment variable REMOTE_HOST not defined in $dot_env_file${normal}")
+      exit 1
+    fi
+    if [ -z "${REMOTE_DB_DUMP_CMD:-}" ]; then
+      (>&2 echo "${bold}Environment variable REMOTE_DB_DUMP_CMD not defined in $dot_env_file${normal} see readme for more information about this setting")
+      exit 1
+    fi
+
+    if command -v pv >/dev/null 2>&1; then
+      ssh ${REMOTE_HOST} ${REMOTE_DB_DUMP_CMD} | pv | eval $(itkdev-docker-compose sql:connect)
+    else
+      cat <<EOF
+Protip: run
+
+  brew install pv
+
+to show progress
+EOF
+      ssh ${REMOTE_HOST} ${REMOTE_DB_DUMP_CMD} | eval $(itkdev-docker-compose sql:connect)
+    fi
+
+    if [ ! -z "${SYNC_DB_POST_SCRIPT:-}" ]; then
+      eval "${SYNC_DB_POST_SCRIPT}"
+    fi
+    ;;
+
+  sync:files)
+    if [ -z "${REMOTE_HOST:-}" ]; then
+      (>&2 echo "${bold}Environment variable REMOTE_HOST not defined in $dot_env_file${normal}")
+      exit 1
+    fi
+    if [ -z "${REMOTE_PATH:-}" ]; then
+      (>&2 echo "${bold}Environment variable REMOTE_PATH not defined in $dot_env_file${normal}")
+      exit 1
+    fi
+    if [ -z "${LOCAL_PATH:-}" ]; then
+      (>&2 echo "${bold}Environment variable LOCAL_PATH not defined in $dot_env_file${normal}")
+      exit 1
+    fi
+
+    REMOTE_PATH=${REMOTE_PATH%/}
+    LOCAL_PATH=${LOCAL_PATH%/}
+    excludes=''
+    if [ ! -z "${REMOTE_EXCLUDE:-}" ]; then
+      for i in "${REMOTE_EXCLUDE[@]}"
+      do
+        excludes+="--exclude='${i}' "
+      done
+    fi
+
+    eval rsync -avz ${excludes} ${REMOTE_HOST}:${REMOTE_PATH}/ ${docker_compose_dir}/${LOCAL_PATH}
+    ;;
+
+  sql:connect)
+    address=$(docker_compose port mariadb 3306)
+    host=$(echo $address | cut -d: -f1)
+    port=$(echo $address | cut -d: -f2)
+    echo mysql --host=$host --port=$port --user=db --password=db db
+    ;;
+
+  sql:open)
+    address=$(docker_compose port mariadb 3306)
+    host=$(echo $address | cut -d: -f1)
+    port=$(echo $address | cut -d: -f2)
+    echo open mariadb://db:db@$host:$port/db?statusColor=F8F8F8\&enviroment=local\&name=${COMPOSE_DOMAIN}
+    open mariadb://db:db@$host:$port/db?statusColor=F8F8F8\&enviroment=local\&name=${COMPOSE_DOMAIN}
+    ;;
+
+  sql:port)
+    docker_compose port mariadb 3306 | cut -d: -f2
+    ;;
+
+  traefik:open)
+    open $($script_path traefik:url)
+    ;;
+
+  traefik:url)
+    label=$(docker inspect --format '{{ index .Config.Labels "traefik.http.routers.traefik.rule"}}' traefik)
+    url=$(echo "${label}" | sed -n 's/.*\`\(.*\)\`.*/\1/p')
+    echo http://${url}:8080;
+    ;;
+
+  mailhog:url)
+    url=http://${COMPOSE_DOMAIN}:$(docker_compose port mailhog 8025 | cut -d: -f2)
+    echo $url
+    ;;
+
+  mailhog:open)
+    open $(itkdev-docker-compose mailhog:url)
+    ;;
+
+  xdebug)
+    echo "Deprecated command use xdebug2 (PHP =< 7.2) or xdebug3 (PHP >= 7.3)"
+    ;;
+
+  xdebug2)
+    PHP_XDEBUG=1 \
+    PHP_XDEBUG_REMOTE_AUTOSTART=1 \
+    docker_compose up -d
+
+    cat <<'EOF' | sed "s|«project directory»|$PWD|"
+
+================================================================================
+
+To debug from the command line, add `PHP_IDE_CONFIG=serverName=localhost` to the
+`phpfpm` environment:
+
+# docker-compose.yml
+phpfpm:
+    image: itkdev/php7.2-fpm:latest
+    environment:
+      …
+      - PHP_IDE_CONFIG=serverName=localhost
+
+and define "localhost" as a server in PhpStorm (Preferences > Languages &
+Frameworks > PHP > Servers):
+
+Name: localhost
+Host: localhost
+Path mapping: «project directory» → /app
+
+You may also want to uncheck "Force break at first line when no path mapping
+specified" and/or "Force break at first line when a script is outside the
+project" in PhpStorm (Preferences > Languages & Frameworks > PHP > Debug).
+
+================================================================================
+
+EOF
+    ;;
+
+  xdebug3)
+    XDEBUG_MODE=debug \
+    XDEBUG_SESSION=1 \
+    docker_compose up -d
+
+    cat <<'EOF' | sed "s|«project directory»|$PWD|"
+
+================================================================================
+
+To debug from the command line, add `PHP_IDE_CONFIG=serverName=localhost` to the
+`phpfpm` environment:
+
+# docker-compose.yml
+phpfpm:
+    image: itkdev/php7.2-fpm:latest
+    environment:
+      …
+      - PHP_IDE_CONFIG=serverName=localhost
+
+and define "localhost" as a server in PhpStorm (Preferences > Languages &
+Frameworks > PHP > Servers):
+
+Name: localhost
+Host: localhost
+Path mapping: «project directory» → /app
+
+You may also want to uncheck "Force break at first line when no path mapping
+specified" and/or "Force break at first line when a script is outside the
+project" in PhpStorm (Preferences > Languages & Frameworks > PHP > Debug).
+
+================================================================================
+
+EOF
+    ;;
+
+  hosts:insert)
+    # Remove any existing entry
+    sudo sed -i '.itkdev-docker-compose' "/${COMPOSE_DOMAIN}/d" /etc/hosts
+    # Append the entry
+    echo "0.0.0.0 ${COMPOSE_DOMAIN} # itkdev-docker-compose" | sudo tee -a /etc/hosts
+    ;;
+
+  images:pull)
+    docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "<none>" | sort | uniq
+    read -p "Are you sure you want to update all images? " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+      docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "<none>" | sort | uniq | xargs -L1 docker pull
+    fi
+    ;;
+
+  drush)
+    root=/app
+    if [ -d $docker_compose_dir/web ]; then
+      root=/app/web
+    fi
+    if [ -e $docker_compose_dir/vendor/bin/drush ]; then
+      docker_compose exec phpfpm /app/vendor/bin/drush --root=$root "$@"
+    else
+      docker_compose run --rm drush --root=$root "$@"
+    fi
+    ;;
+
+  composer)
+    docker_compose exec phpfpm composer "$@"
+    ;;
+
+  bin/*|vendor/bin/*)
+    docker_compose exec phpfpm /app/$cmd "$@"
+    ;;
+
+  down)
+    docker_compose down --volumes --remove-orphans
+    ;;
+
+  shell)
+    docker_compose exec "$@" /usr/bin/env sh
+    ;;
+
+  *)
+    docker_compose "$cmd" "$@"
+    ;;
+esac

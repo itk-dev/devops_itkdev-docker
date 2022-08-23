@@ -1,0 +1,21 @@
+
+api:
+  dashboard: true
+  insecure: true
+  debug: true
+
+entryPoints:
+  http:
+    address: ":80"
+  https:
+    address: ":443"
+    http:
+      tls:
+        {}
+
+providers:
+  file:
+    directory: /config
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
