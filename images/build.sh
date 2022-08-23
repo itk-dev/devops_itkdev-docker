@@ -36,9 +36,9 @@ VERSION=1.1.12
 
 (cd mariadb && docker build --pull --no-cache --tag=itkdev/mariadb .)
 
-(cd supervisor && docker build --pull --no-cache --build-arg VERSION=7.4 --tag=itkdev/supervirsor-php7.4:alpine .)
-(cd supervisor && docker build --pull --no-cache --build-arg VERSION=8.0 --tag=itkdev/supervirsor-php8.0:alpine .)
-(cd supervisor && docker build --pull --no-cache --build-arg VERSION=8.1 --tag=itkdev/supervirsor-php8.1:alpine .)
+(cd supervisor && docker build --pull --no-cache --build-arg VERSION=7.4 --tag=itkdev/supervisor-php7.4:alpine .)
+(cd supervisor && docker build --pull --no-cache --build-arg VERSION=8.0 --tag=itkdev/supervisor-php8.0:alpine .)
+(cd supervisor && docker build --pull --no-cache --build-arg VERSION=8.1 --tag=itkdev/supervisor-php8.1:alpine .)
 
 docker image tag itkdev/php5.6-fpm itkdev/php5.6-fpm:${VERSION}
 docker push itkdev/php5.6-fpm
@@ -99,12 +99,12 @@ docker push itkdev/php8.2-fpm:alpine
 # docker push itkdev/php8.2-fpm:${VERSION}
 docker push itkdev/php8.2-fpm:alpine-${VERSION}
 
-docker push itkdev/supervirsor-php7.4:alpine
-docker push itkdev/supervirsor-php7.4:alpine-${VERSION}
-docker push itkdev/supervirsor-php8.0:alpine
-docker push itkdev/supervirsor-php8.0:alpine-${VERSION}
-docker push itkdev/supervirsor-php8.1:alpine
-docker push itkdev/supervirsor-php8.1:alpine-${VERSION}
+docker push itkdev/supervisor-php7.4:alpine
+docker push itkdev/supervisor-php7.4:alpine-${VERSION}
+docker push itkdev/supervisor-php8.0:alpine
+docker push itkdev/supervisor-php8.0:alpine-${VERSION}
+docker push itkdev/supervisor-php8.1:alpine
+docker push itkdev/supervisor-php8.1:alpine-${VERSION}
 
 docker image tag itkdev/drush6 itkdev/drush6:${VERSION}
 docker push itkdev/drush6
