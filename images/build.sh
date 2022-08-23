@@ -100,10 +100,15 @@ docker push itkdev/php8.2-fpm:alpine
 docker push itkdev/php8.2-fpm:alpine-${VERSION}
 
 docker push itkdev/supervisor-php7.4:alpine
+docker image tag itkdev/supervisor-php7.4:alpine itkdev/supervisor-php7.4:alpine-${VERSION}
 docker push itkdev/supervisor-php7.4:alpine-${VERSION}
+
 docker push itkdev/supervisor-php8.0:alpine
+docker image tag itkdev/supervisor-php8.0:alpine itkdev/supervisor-php8.0:alpine-${VERSION}
 docker push itkdev/supervisor-php8.0:alpine-${VERSION}
+
 docker push itkdev/supervisor-php8.1:alpine
+docker image tag itkdev/supervisor-php8.1:alpine itkdev/supervisor-php8.1:alpine-${VERSION}
 docker push itkdev/supervisor-php8.1:alpine-${VERSION}
 
 docker image tag itkdev/drush6 itkdev/drush6:${VERSION}
