@@ -4,7 +4,7 @@
 set -e
 set -x
 
-VERSION=1.1.12
+VERSION=1.1.13
 
 (cd php5.6-fpm/ubuntu && docker build --pull --no-cache --tag=itkdev/php5.6-fpm .)
 (cd php5.6-fpm/alpine && docker build --pull --no-cache --tag=itkdev/php5.6-fpm:alpine .)
