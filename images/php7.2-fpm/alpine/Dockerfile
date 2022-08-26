@@ -24,6 +24,9 @@ ENV PHP_OPCACHE_ENABLED="1" \
     PHP_GROUP="deploy" \
     TZ=Europe/Copenhagen
 
+# PHP7.2 base image is not update anymore, so try to fix stuff.
+RUN apk upgrade --no-cache
+
 RUN apk --update add --no-cache \
         libxslt-dev \
         libzip-dev \
