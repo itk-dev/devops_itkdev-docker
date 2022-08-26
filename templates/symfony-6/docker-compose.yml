@@ -1,4 +1,4 @@
-# itk-version: 2.0.1
+# itk-version: 2.0.2
 version: "3"
 
 networks:
@@ -61,7 +61,7 @@ services:
 #      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   mailhog:
-    image: mailhog/mailhog
+    image: itkdev/mailhog
     networks:
       - app
       - frontend
