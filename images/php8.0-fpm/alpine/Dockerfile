@@ -99,8 +99,8 @@ ADD https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_li
 RUN chmod +x /usr/local/bin/mhsendmail
 
 # Add deploy use to match server.
-RUN addgroup -g 1001 deploy \
-&& adduser -G deploy -u 1001 -h /home/deploy -D deploy
+RUN addgroup -g 1042 deploy \
+&& adduser -G deploy -u 1042 -h /home/deploy -D deploy
 
 # Add git global config
 COPY gitconfig /home/deploy/.gitconfig
