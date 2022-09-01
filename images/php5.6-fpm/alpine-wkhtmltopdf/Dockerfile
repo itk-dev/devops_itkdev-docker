@@ -10,3 +10,7 @@ RUN apk add --update --no-cache \
 COPY --from=madnight/docker-alpine-wkhtmltopdf /bin/wkhtmltopdf /bin/wkhtmltopdf
 COPY --from=madnight/docker-alpine-wkhtmltopdf /usr/lib/libssl.so.1.1 /usr/lib/libssl.so.1.1
 COPY --from=madnight/docker-alpine-wkhtmltopdf /usr/lib/libcrypto.so.1.1 /usr/lib/libcrypto.so.1.1
+
+RUN apk add shadow && \
+groupmod -g 1042 deploy && \
+usermod -u 1042 -g 1042 deploy
