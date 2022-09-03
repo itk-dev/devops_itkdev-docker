@@ -126,10 +126,12 @@ docker trust sign itkdev/php8.1-fpm:${VERSION}
 docker trust sign itkdev/php8.1-fpm:alpine
 docker trust sign itkdev/php8.1-fpm:alpine-${VERSION}
 
-# docker image tag itkdev/php8.2-fpm itkdev/php8.2-fpm:${VERSION}
+docker image tag itkdev/php8.2-fpm itkdev/php8.2-fpm:${VERSION}
 docker image tag itkdev/php8.2-fpm:alpine itkdev/php8.2-fpm:alpine-${VERSION}
 docker push itkdev/php8.2-fpm:alpine
 docker push itkdev/php8.2-fpm:alpine-${VERSION}
+docker trust sign itkdev/php8.2-fpm:alpine
+docker trust sign itkdev/php8.2-fpm:alpine-${VERSION}
 
 docker image tag itkdev/supervisor-php7.4:alpine itkdev/supervisor-php7.4:alpine-${VERSION}
 docker push itkdev/supervisor-php7.4:alpine
