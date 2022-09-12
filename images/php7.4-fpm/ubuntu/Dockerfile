@@ -59,6 +59,22 @@ RUN DEBIAN_FRONTEND=noninteractive \
 
 COPY etc/ /etc/
 
+# Add MSSQL server support.
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+RUN apt-get update -y \
+    && ACCEPT_EULA=Y apt-get install -y \
+    msodbcsql17 \
+    php${PHP_VERSION}-dev \
+    php${PHP_VERSION}-xml \
+    unixodbc-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && pecl install sqlsrv pdo_sqlsrv
+
+RUN bash -c 'printf "; priority=20\nextension=sqlsrv.so\n" > /etc/php/7.4/mods-available/sqlsrv.ini' \
+    && bash -c 'printf "; priority=30\nextension=pdo_sqlsrv.so\n" > /etc/php/7.4/mods-available/pdo_sqlsrv.ini' \
+    && phpenmod sqlsrv pdo_sqlsrv
+
 # Ensure right PHP version is default
 RUN update-alternatives --set php /usr/bin/php${PHP_VERSION}
 
