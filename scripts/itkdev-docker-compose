@@ -219,6 +219,9 @@ Commands:
   composer
                 Run composer command inside phpfpm container
 
+  php
+                Run php command inside phpfpm container
+
   bin/*
   vendor/bin/*
                 Run command command inside phpfpm container
@@ -617,6 +620,10 @@ EOF
 
   composer)
     docker_compose exec phpfpm composer "$@"
+    ;;
+
+  php)
+    docker_compose exec phpfpm php "$@"
     ;;
 
   bin/*|vendor/bin/*)

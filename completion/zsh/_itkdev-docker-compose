@@ -52,6 +52,7 @@ _itkdev-docker-compose() {
               'hosts\:insert[Insert the docker site url into the hosts file.]' \
               'images\:pull[Update/pull all docker images.]' \
               'composer[Run composer command inside phpfpm container.]' \
+              'php[Run php command inside phpfpm container.]' \
               'version[Display this tool'\''s current version.]' \
         && ret=0
 
