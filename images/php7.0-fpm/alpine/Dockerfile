@@ -105,6 +105,12 @@ WORKDIR /app
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+# Update lets-encrypt root certs.
+COPY etc/ca-certificates.conf /etc/ca-certificates.conf
+RUN mkdir /usr/share/ca-certificates/extra
+COPY certs/* /usr/share/ca-certificates/extra/
+RUN update-ca-certificates
+
 # Add deploy use to match server.
 RUN addgroup -g 1042 deploy \
     && adduser -G deploy -u 1042 -h /home/deploy -D deploy \
