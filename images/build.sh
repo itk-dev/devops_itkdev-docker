@@ -4,7 +4,7 @@
 set -e
 set -x
 
-VERSION=1.1.17
+VERSION=1.1.18
 
 (cd php5.6-fpm/ubuntu && docker build --pull --no-cache --tag=itkdev/php5.6-fpm .)
 (cd php5.6-fpm/alpine && docker build --pull --no-cache --tag=itkdev/php5.6-fpm:alpine .)
@@ -113,7 +113,7 @@ docker trust sign itkdev/php7.4-fpm:alpine-${VERSION}
 docker trust sign itkdev/php7.4-fpm:alpine-wkhtmltopdf
 docker trust sign itkdev/php7.4-fpm:alpine-wkhtmltopdf-${VERSION}
 docker trust sign itkdev/php7.4-fpm:wkhtmltopdf
-docker trust sign itkdev/php7.4-fpm:wkhtmltopdf-${VERSION
+docker trust sign itkdev/php7.4-fpm:wkhtmltopdf-${VERSION}
 
 docker image tag itkdev/php8.0-fpm itkdev/php8.0-fpm:${VERSION}
 docker image tag itkdev/php8.0-fpm:alpine itkdev/php8.0-fpm:alpine-${VERSION}
