@@ -21,6 +21,7 @@ ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="1" \
     PHP_SLOWLOG="/var/log/php-slow.log" \
     PHP_USER="deploy" \
     PHP_GROUP="deploy" \
+    PHP_SENDMAIL_PATH='/usr/sbin/sendmail -S host.docker.internal -t -i' \
     TZ=Europe/Copenhagen
 
 # PHP5.6 base image is not update anymore, so try to fix stuff.
@@ -81,9 +82,6 @@ RUN apk --update add --no-cache --virtual .build-deps autoconf g++ make rabbitmq
 COPY --from=composer:1 /usr/bin/composer /usr/bin/composer1
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer2
 
-# Set default composer version (can be overriden in entry-point via COMPOSER_VERSION env)
-RUN ln -fs /usr/bin/composer1 /usr/local/bin/composer
-
 # Added cache tool.
 ADD https://gordalina.github.io/cachetool/downloads/cachetool.phar /usr/local/bin/cachetool
 RUN chmod +x /usr/local/bin/cachetool
@@ -92,8 +90,8 @@ RUN chmod +x /usr/local/bin/cachetool
 RUN mv ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini
 
 # Copy custom PHP configuration.
-COPY etc/php/conf.d/opcache.ini ${PHP_INI_DIR}/conf.d/20-opcache.ini
-COPY etc/php/conf.d/php.ini ${PHP_INI_DIR}/conf.d/20-php.ini
+COPY etc/php/opcache.ini ${PHP_INI_DIR}/conf.d/20-opcache.ini
+COPY etc/php/php.ini ${PHP_INI_DIR}/conf.d/20-php.ini
 
 # Custom FPM configuration.
 COPY etc/php-fpm.d/fpm.ini ${PHP_INI_DIR}/../php-fpm.d/zz-fpm-docker.conf
@@ -102,20 +100,6 @@ COPY etc/php-fpm.d/fpm.ini ${PHP_INI_DIR}/../php-fpm.d/zz-fpm-docker.conf
 ADD https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 /usr/local/bin/mhsendmail
 RUN chmod +x /usr/local/bin/mhsendmail
 
-# Add deploy use to match server.
-RUN addgroup -g 1042 deploy \
-&& adduser -G deploy -u 1042 -h /home/deploy -D deploy
-
-# Add git global config
-COPY gitconfig /home/deploy/.gitconfig
-RUN chown deploy:deploy /home/deploy/.gitconfig
-
-# Update lets-encrypt root certs.
-COPY etc/ca-certificates.conf /etc/ca-certificates.conf
-RUN mkdir /usr/share/ca-certificates/extra
-COPY certs/* /usr/share/ca-certificates/extra/
-RUN update-ca-certificates
-
 EXPOSE 9000
 
 WORKDIR /app
@@ -123,4 +107,22 @@ WORKDIR /app
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-CMD [ "docker-entrypoint.sh" ]
+# Add deploy use to match server.
+RUN addgroup -g 1042 deploy \
+    && adduser -G deploy -u 1042 -h /home/deploy -D deploy \
+    && echo "deploy:`date +%s | sha256sum | base64 | head -c 32`" | chpasswd
+
+# Ensure app is owned by deploy
+RUN chown deploy:deploy /app
+
+# Switch user to deploy
+user deploy
+
+# Add git global config
+COPY gitconfig /home/deploy/.gitconfig
+
+# Add local bin to path
+RUN mkdir -p /home/deploy/bin
+ENV PATH="${PATH}:/home/deploy/bin"
+
+CMD [ "/usr/local/bin/docker-entrypoint.sh" ]

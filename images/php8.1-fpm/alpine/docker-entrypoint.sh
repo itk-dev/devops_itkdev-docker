@@ -1,10 +1,6 @@
 #!/bin/sh
-set -e
 
-# Add docker host domain to hosts file
-if [ ! -z "${DOCKER_HOST_DOMAIN}" ]; then
-  echo $(getent hosts host.docker.internal | cut -d" " -f1) ${DOCKER_HOST_DOMAIN} >> /etc/hosts
-fi
+set -e
 
 ## Set selected composer version. Default version 2.
 if [ ! -z "${COMPOSER_VERSION}" ]; then
@@ -24,7 +20,5 @@ echo "Starting PHP 8.1 FPM"
 if [ "${1#-}" != "$1" ]; then
   set -- php-fpm "$@"
 fi
-
-env
 
 exec php-fpm "$@"

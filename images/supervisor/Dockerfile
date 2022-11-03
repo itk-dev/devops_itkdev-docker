@@ -3,6 +3,8 @@ ARG VERSION=8.1
 FROM itkdev/php${VERSION}-fpm:alpine
 LABEL maintainer="ITK Dev <itkdev@mkb.aarhus.dk>"
 
+user root
+
 RUN apk --update add --no-cache \
         supervisor \
         inotify-tools

@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -e
 
 # Add docker host domain to hosts file

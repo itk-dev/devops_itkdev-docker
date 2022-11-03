@@ -27,4 +27,4 @@ fi
 
 ## Start the php FPM process.
 echo "Starting PHP 8.0 FPM"
-php-fpm8.0 -F --pid /var/run/php/php-fpm8.0.pid -y /etc/php/8.0/fpm/php-fpm.conf
+exec php-fpm8.0 -F --pid /var/run/php/php-fpm8.0.pid -y /etc/php/8.0/fpm/php-fpm.conf

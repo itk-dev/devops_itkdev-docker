@@ -103,17 +103,20 @@ COPY etc/php-fpm.d/fpm.ini ${PHP_INI_DIR}/../php-fpm.d/zz-fpm-docker.conf
 ADD https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 /usr/local/bin/mhsendmail
 RUN chmod +x /usr/local/bin/mhsendmail
 
-# Add deploy use to match server.
-RUN addgroup -g 1042 deploy \
-    && adduser -G deploy -u 1042 -h /home/deploy -D deploy \
-    && echo "deploy:`date +%s | sha256sum | base64 | head -c 32`" | chpasswd
-
 EXPOSE 9000
 
 WORKDIR /app
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Add deploy use to match server.
+RUN addgroup -g 1042 deploy \
+    && adduser -G deploy -u 1042 -h /home/deploy -D deploy \
+    && echo "deploy:`date +%s | sha256sum | base64 | head -c 32`" | chpasswd
+
+# Ensure app is owned by deploy
+RUN chown deploy:deploy /app
 
 # Switch user to deploy
 user deploy
@@ -125,4 +128,4 @@ COPY gitconfig /home/deploy/.gitconfig
 RUN mkdir -p /home/deploy/bin
 ENV PATH="${PATH}:/home/deploy/bin"
 
-ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
+CMD [ "/usr/local/bin/docker-entrypoint.sh" ]
