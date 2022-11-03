@@ -1,7 +1,7 @@
 FROM itkdev/php7.3-fpm
 LABEL maintainer "ITK Dev <itkdev@mkb.aarhus.dk>"
 
-user root
+USER root
 
 RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/$version \
@@ -11,4 +11,4 @@ RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && printf "extension=blackfire.so\nblackfire.agent_socket=tcp://blackfire:8707\n" > /etc/php/7.3/fpm/conf.d/10-blackfire.ini \
     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
 
-user deploy
+USER deploy

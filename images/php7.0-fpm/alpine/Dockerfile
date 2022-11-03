@@ -120,7 +120,7 @@ RUN addgroup -g 1042 deploy \
 RUN chown deploy:deploy /app
 
 # Switch user to deploy
-user deploy
+USER deploy
 
 # Add git global config
 COPY gitconfig /home/deploy/.gitconfig
