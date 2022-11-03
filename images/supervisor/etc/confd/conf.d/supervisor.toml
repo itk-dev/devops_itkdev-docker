@@ -1,6 +1,7 @@
 [template]
 src = "supervisor.tmpl"
-dest = "/etc/supervisor.d/cover_services_queues.ini"
+dest = "/home/deploy/supervisor.d/runner.ini"
+owner = "deploy"
 mode = "0644"
 keys = [
     "/supervisor-config"

@@ -1,4 +1,4 @@
-[program:queues]
+[program:runner]
 command={{ getenv "APP_SUPERVISOR_COMMAND" }}
 process_name=%(program_name)s_%(process_num)02d
 numprocs={{ getenv "APP_SUPERVISOR_WORKERS" "1" }}
@@ -9,3 +9,4 @@ user={{ getenv "APP_SUPERVISOR_USER" "deploy" }}
 stdout_logfile=/dev/fd/1
 stdout_logfile_maxbytes=0
 redirect_stderr=true
+nodaemon=true
