@@ -6,24 +6,25 @@ if [ ! -z "${DOCKER_HOST_DOMAIN}" ]; then
   echo $(getent hosts host.docker.internal | cut -d" " -f1) ${DOCKER_HOST_DOMAIN} >> /etc/hosts
 fi
 
-## Set selected composer version. Default version 1.
+## Set selected composer version. Default version 2.
 if [ ! -z "${COMPOSER_VERSION}" ]; then
   if [ "${COMPOSER_VERSION}" = "1" ]; then
-    ln -fs /usr/bin/composer1 /usr/local/bin/composer
+    ln -fs /usr/bin/composer1 /home/deploy/bin/composer
   else
-    ln -fs /usr/bin/composer2 /usr/local/bin/composer
+    ln -fs /usr/bin/composer2 /home/deploy/bin/composer
   fi
 else
-  ln -fs /usr/bin/composer1 /usr/local/bin/composer
+  ln -fs /usr/bin/composer2 /home/deploy/bin/composer
 fi
 
-## Add mailhog options to capture mails from PHP.
-if [ ! -z "${PHP_MAILHOG_ENABLE}" ]; then
-  echo "sendmail_path = '/usr/local/bin/mhsendmail --smtp-addr=\"${PHP_MAILHOG_SERVER}:${PHP_MAILHOG_PORT}\"'" >> ${PHP_INI_DIR}/conf.d/20-php.ini
-else
-  echo "sendmail_path = '/usr/sbin/sendmail -S host.docker.internal -t -i'" >> ${PHP_INI_DIR}/conf.d/20-php.ini
-fi
-
-## Start the php FPM process.
+## Start the PHP FPM process.
 echo "Starting PHP 8.1 FPM"
-/usr/local/bin/docker-php-entrypoint php-fpm
+
+# first arg is `-f` or `--some-option`
+if [ "${1#-}" != "$1" ]; then
+  set -- php-fpm "$@"
+fi
+
+env
+
+exec php-fpm "$@"
