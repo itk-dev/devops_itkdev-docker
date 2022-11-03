@@ -1,6 +1,6 @@
 ARG VERSION=8.1
 
-FROM itkdev/php${VERSION}-fpm:alpine-1.1.17
+FROM itkdev/php${VERSION}-fpm:alpine
 LABEL maintainer="ITK Dev <itkdev@mkb.aarhus.dk>"
 
 RUN apk --update add --no-cache \
