@@ -233,7 +233,7 @@ Commands:
                 Display this tool's current version
 
   *
-                Pass command and arguments to `docker-compose` and
+                Pass command and arguments to `docker compose` and
                 hope for the best.
 
 Configuration:
@@ -288,13 +288,13 @@ if [[ "$#" -gt "0" && "$1" == "traefik:start" ]]; then
     exit 22;
   fi
   docker network inspect frontend >/dev/null 2>&1 || docker network create --driver=bridge --attachable --internal=false frontend
-  $(cd ${script_dir}/../traefik/; docker-compose up -d)
+  $(cd ${script_dir}/../traefik/; docker compose up -d)
   exit
 fi
 
 # Allow traefik:stop without existence of .env
 if [[ "$#" -gt "0" && "$1" == "traefik:stop" ]]; then
-  $(cd ${script_dir}/../traefik/; docker-compose down --volumes)
+  $(cd ${script_dir}/../traefik/; docker compose down --volumes)
   exit
 fi
 
@@ -378,11 +378,11 @@ if [ ! "$is_treafik_running" == "true" ] && [ ! "$is_dory_running" == "true" ]; 
   (>&2 echo "${bold}Reverse proxy has not been started. Hostname will not be resolved to containers and not all commands will work correctly.${normal}")
 fi
 
-# Helper function to call `docker-compose` in the right context
+# Helper function to call `docker compose` in the right context
 docker_compose () {
-    # Note: Apparently, using --project-directory or --file options for `docker-compose` will break use of `$PWD` in
-    # docker-compose.yml. Therefore, we `cd` before running `docker-compose` command.
-    (cd "$docker_compose_dir" && COMPOSE_DOMAIN=${COMPOSE_DOMAIN} docker-compose "$@")
+    # Note: Apparently, using --project-directory or --file options for `docker compose` will break use of `$PWD` in
+    # docker-compose.yml. Therefore, we `cd` before running `docker compose` command.
+    (cd "$docker_compose_dir" && COMPOSE_DOMAIN=${COMPOSE_DOMAIN} docker compose "$@")
 }
 
 cmd="$1"
