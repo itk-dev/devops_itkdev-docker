@@ -83,4 +83,6 @@ EXPOSE 9000
 WORKDIR /app
 
 COPY docker-entrypoint.sh /usr/local/bin/
-CMD [ "docker-entrypoint.sh" ]
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+CMD [ "/usr/local/bin/docker-entrypoint.sh" ]

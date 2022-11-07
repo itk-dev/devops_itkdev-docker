@@ -10,9 +10,9 @@ COPY --from=mailhog/mailhog /usr/local/bin/MailHog /usr/local/bin/
 
 USER mailhog
 
+# Expose the SMTP and HTTP ports:
+EXPOSE 1025 8025
+
 WORKDIR /home/mailhog
 
 ENTRYPOINT ["MailHog"]
-
-# Expose the SMTP and HTTP ports:
-EXPOSE 1025 8025

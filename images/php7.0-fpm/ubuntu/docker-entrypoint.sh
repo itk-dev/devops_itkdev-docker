@@ -27,4 +27,4 @@ fi
 
 ## Start the php FPM process.
 echo "Starting PHP 7.0 FPM"
-php-fpm7.0 -F --pid /var/run/php/php-fpm7.0.pid -y /etc/php/7.0/fpm/php-fpm.conf
+exec php-fpm7.0 -F --pid /var/run/php/php-fpm7.0.pid -y /etc/php/7.0/fpm/php-fpm.conf
