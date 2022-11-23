@@ -11,7 +11,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
 && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install Drush using Composer.
-RUN composer global require drush/drush:"$DRUSH_VERSION" --prefer-dist
+RUN composer1 global require drush/drush:"$DRUSH_VERSION" --prefer-dist
 
 # Add registry_rebuild module.
 RUN /root/.composer/vendor/bin/drush dl registry_rebuild
