@@ -46,8 +46,8 @@ RUN apk --update add --no-cache \
         freetype-dev \
         libjpeg-turbo-dev \
         libjpeg-turbo \
-        libpng-dev \
-    && docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ --with-freetype-dir=/usr/include/ \
+        libwebp-dev \
+    && docker-php-ext-configure gd --with-jpeg-dir=/usr/include/ --with-webp-dir=/usr/include/ --with-freetype-dir=/usr/include/  \
     && docker-php-ext-install -j$(nproc) \
         bcmath \
         calendar \

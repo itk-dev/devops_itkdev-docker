@@ -4,7 +4,7 @@
 set -e
 set -x
 
-VERSION=1.1.20
+VERSION=1.1.21
 
 (cd php5.6-fpm/ubuntu && docker build --pull --no-cache --tag=itkdev/php5.6-fpm .)
 (cd php5.6-fpm/alpine && docker build --pull --no-cache --tag=itkdev/php5.6-fpm:alpine .)
@@ -31,7 +31,7 @@ VERSION=1.1.20
 (cd php8.1-fpm/ubuntu && docker build --pull --no-cache --tag=itkdev/php8.1-fpm .)
 (cd php8.1-fpm/alpine && docker build --pull --no-cache --tag=itkdev/php8.1-fpm:alpine .)
 
-#(cd php8.2-fpm/ubuntu && docker build --pull --no-cache --tag=itkdev/php8.2-fpm .)
+(cd php8.2-fpm/ubuntu && docker build --pull --no-cache --tag=itkdev/php8.2-fpm .)
 (cd php8.2-fpm/alpine && docker build --pull --no-cache --tag=itkdev/php8.2-fpm:alpine .)
 
 (cd drush6 && docker build --no-cache --tag=itkdev/drush6 .)
@@ -98,6 +98,7 @@ docker trust sign itkdev/php7.3-fpm:blackfire
 docker image tag itkdev/php7.4-fpm itkdev/php7.4-fpm:${VERSION}
 docker image tag itkdev/php7.4-fpm:alpine itkdev/php7.4-fpm:alpine-${VERSION}
 docker image tag itkdev/php7.4-fpm:alpine itkdev/php7.4-fpm:alpine-wkhtmltopdf-${VERSION}
+docker image tag itkdev/php7.4-fpm:wkhtmltopdf itkdev/php7.4-fpm:wkhtmltopdf-${VERSION}
 docker push itkdev/php7.4-fpm:latest
 docker push itkdev/php7.4-fpm:alpine
 docker push itkdev/php7.4-fpm:${VERSION}
@@ -137,12 +138,16 @@ docker trust sign itkdev/php8.1-fpm:${VERSION}
 docker trust sign itkdev/php8.1-fpm:alpine
 docker trust sign itkdev/php8.1-fpm:alpine-${VERSION}
 
-# docker image tag itkdev/php8.2-fpm itkdev/php8.2-fpm:${VERSION}
+docker image tag itkdev/php8.2-fpm itkdev/php8.2-fpm:${VERSION}
 docker image tag itkdev/php8.2-fpm:alpine itkdev/php8.2-fpm:alpine-${VERSION}
+docker push itkdev/php8.2-fpm
+docker push itkdev/php8.2-fpm:${VERSION}
 docker push itkdev/php8.2-fpm:alpine
 docker push itkdev/php8.2-fpm:alpine-${VERSION}
 docker trust sign itkdev/php8.2-fpm:alpine
 docker trust sign itkdev/php8.2-fpm:alpine-${VERSION}
+docker trust sign itkdev/php8.2-fpm:latest
+docker trust sign itkdev/php8.2-fpm:${VERSION}
 
 docker image tag itkdev/supervisor-php7.4:alpine itkdev/supervisor-php7.4:alpine-${VERSION}
 docker push itkdev/supervisor-php7.4:alpine
