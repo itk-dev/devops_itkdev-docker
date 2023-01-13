@@ -62,16 +62,16 @@ RUN apk --update add --no-cache \
         zip
 
 RUN apk --update add --no-cache --virtual .build-deps autoconf g++ gnupg unixodbc-dev make zlib-dev libmemcached-dev cyrus-sasl-dev \
-    && curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.8.1.1-1_amd64.apk \
-    && curl -O https://download.microsoft.com/download/e/4/e/e4e67866-dffd-428c-aac7-8d28ddafb39b/msodbcsql17_17.8.1.1-1_amd64.sig \
+    && curl -O https://download.microsoft.com/download/8/6/8/868e5fc4-7bfe-494d-8f9d-115cbcdb52ae/msodbcsql18_18.1.2.1-1_amd64.apk \
+    && curl -O https://download.microsoft.com/download/8/6/8/868e5fc4-7bfe-494d-8f9d-115cbcdb52ae/msodbcsql18_18.1.2.1-1_amd64.sig \
     && curl https://packages.microsoft.com/keys/microsoft.asc | gpg --import - \
-    && gpg --verify msodbcsql17_17.8.1.1-1_amd64.sig msodbcsql17_17.8.1.1-1_amd64.apk \
-    && yes | apk add --allow-untrusted msodbcsql17_17.8.1.1-1_amd64.apk \
+    && gpg --verify msodbcsql18_18.1.2.1-1_amd64.sig msodbcsql18_18.1.2.1-1_amd64.apk \
+    && yes | apk add --allow-untrusted msodbcsql18_18.1.2.1-1_amd64.apk \
     && pecl install sqlsrv pdo_sqlsrv \
     && pecl install redis \
     && pecl install memcached \
     && docker-php-ext-enable redis memcached sqlsrv pdo_sqlsrv \
-    && rm msodbcsql17_17.8.1.1-1_amd64.* \
+    && rm msodbcsql18_18.1.2.1-1_amd64.* \
     && apk del .build-deps
 
 # Install AMQP support
