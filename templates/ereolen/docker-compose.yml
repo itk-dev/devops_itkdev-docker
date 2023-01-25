@@ -1,4 +1,4 @@
-# itk-version: 2.0.0
+# itk-version: 2.0.1
 version: "3"
 
 networks:
@@ -54,7 +54,8 @@ services:
     ports:
       - '8080'
     volumes:
-      - ${PWD}/.docker/vhost.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./.docker/vhost.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./.docker/nginx.conf:/etc/nginx/nginx.conf:ro
       - nfsApp:/app:delegated
 
   memcached:
