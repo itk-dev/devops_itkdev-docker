@@ -23,7 +23,7 @@ services:
     depends_on:
       - memcached
     volumes:
-      - .:/app:delegated
+      - .:/app
       - drush-cache:/root/.drush
 
   nginx:
