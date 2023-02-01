@@ -3,7 +3,7 @@ ARG VERSION=8.1
 FROM itkdev/php${VERSION}-fpm:alpine
 LABEL maintainer="ITK Dev <itkdev@mkb.aarhus.dk>"
 
-ENV APP_SUPERVISOR_COMMAND='sh -c "cowsay \"You should set the APP_SUPERVISOR_COMMAND too a command to run...\"; sleep infinity"' \
+ENV APP_SUPERVISOR_COMMAND='sh -c "echo \"You should set the APP_SUPERVISOR_COMMAND too a command to run...\"; sleep infinity"' \
     APP_SUPERVISOR_WORKERS=1 \
     APP_SUPERVISOR_USER="deploy"
 
@@ -12,8 +12,6 @@ USER root
 RUN apk --update add --no-cache \
         supervisor \
         inotify-tools
-
-RUN apk --update add --no-cache --repository https://dl-3.alpinelinux.org/alpine/edge/testing cowsay
 
 RUN docker-php-ext-configure pcntl --enable-pcntl \
   && docker-php-ext-install pcntl
