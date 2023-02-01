@@ -168,7 +168,7 @@ because it is no longer compatible with MacOS. (@see https://github.com/docker/f
 If you have previously enabled NFS with `nfs:enable` you should clean up as
 follows:
 ```shell
-sudo nano /etc/hosts
+sudo nano /etc/exports
 # Delete the line matching this pattern, and save you changes
 # /System/Volumes/Data/Users -alldirs -mapall=501:20 localhost
 
