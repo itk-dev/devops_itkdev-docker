@@ -11,19 +11,6 @@ Mac](https://docs.docker.com/docker-for-mac/install/) and create account at
 [https://hub.docker.com/](https://hub.docker.com/) the account can be link to
 "itkdev" organisation allow you to push new images.
 
-## Optimisations
-
-From version 2.x this tool supports the usage of NFS mounted name-volumes, which
-gives faster file synchronisation during composer install and cache clear etc.
-
-It comes with a command `nfs:enable` that exports the Users directory through
-NFS to localhost, so docker can map directories into the containers. It also
-requires some changes to the docker-compose.yml files which have been updated
-to support NFS.
-
-If your project don't want to use NFS mounts you simply can remove the `nfsapp`
-volume and change the mappings back to `./` in the docker-compose.yml files.
-
 ## Usage
 
 ### Requirement for all commands to work
@@ -170,3 +157,25 @@ The fuld list can be found at
 
 ## More
 For more details about usage see https://docs.itkdev.dk
+
+## Previous versions
+
+### NFS mounts removed
+
+From version 3.0.0 the feature to use NFS mounted name-volumes has been removed
+because it is no longer compatible with MacOS. (@see https://github.com/docker/for-mac/issues/6544)
+
+If you have previously enabled NFS with `nfs:enable` you should clean up as
+follows:
+```shell
+sudo nano /etc/exports
+# Delete the line matching this pattern, and save you changes
+# /System/Volumes/Data/Users -alldirs -mapall=501:20 localhost
+
+sudo nano /etc/nfs.conf
+# Delete the line matching this pattern, and save you changes
+# nfs.server.mount.require_resv_port = 0
+
+# Restart the NFS deamon
+sudo nfsd restart
+```

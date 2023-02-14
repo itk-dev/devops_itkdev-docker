@@ -1,4 +1,4 @@
-# itk-version: 2.1.1
+# itk-version: 3.0.0
 version: "3"
 
 networks:
@@ -23,7 +23,7 @@ services:
     depends_on:
       - memcached
     volumes:
-      - .:/app:delegated
+      - .:/app
 
   nginx:
     image: nginxinc/nginx-unprivileged:alpine
