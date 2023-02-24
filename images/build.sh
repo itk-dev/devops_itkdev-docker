@@ -22,8 +22,7 @@ VERSION=1.1.25
 
 (cd php7.4-fpm/ubuntu && docker build --pull --no-cache --tag=itkdev/php7.4-fpm .)
 (cd php7.4-fpm/alpine && docker build --pull --no-cache --tag=itkdev/php7.4-fpm:alpine .)
-
-# (cd php7.4-fpm/alpine-wkhtmltopdf && docker build --no-cache --tag=itkdev/php7.4-fpm:alpine-wkhtmltopdf .)
+(cd php7.4-fpm/alpine-wkhtmltopdf && docker build --no-cache --tag=itkdev/php7.4-fpm:alpine-wkhtmltopdf .)
 # (cd php7.4-fpm/ubuntu-wkhtmltopdf && docker build --no-cache --tag=itkdev/php7.4-fpm:wkhtmltopdf .)
 
 (cd php8.0-fpm/ubuntu && docker build --pull --no-cache --tag=itkdev/php8.0-fpm .)
@@ -93,6 +92,7 @@ docker push itkdev/php7.4-fpm:${VERSION}
 docker push itkdev/php7.4-fpm:alpine-${VERSION}
 docker push itkdev/php7.4-fpm:alpine-wkhtmltopdf
 docker push itkdev/php7.4-fpm:alpine-wkhtmltopdf-${VERSION}
+
 # docker push itkdev/php7.4-fpm:wkhtmltopdf
 # docker push itkdev/php7.4-fpm:wkhtmltopdf-${VERSION}
 
