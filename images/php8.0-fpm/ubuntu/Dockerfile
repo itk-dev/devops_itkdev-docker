@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 LABEL maintainer "ITK Dev <itkdev@mkb.aarhus.dk>"
 
 ENV PHP_VERSION 8.0
@@ -60,7 +60,7 @@ COPY etc/ /etc/
 
 # Add MSSQL server support.
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+    && curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
 RUN apt-get update -y \
     && ACCEPT_EULA=Y apt-get install -y \
     msodbcsql17 \

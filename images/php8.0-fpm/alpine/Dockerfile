@@ -33,6 +33,7 @@ RUN apk --update add --no-cache \
         git \
         unzip \
         icu-dev \
+        icu-data-full \
         openldap-dev \
         libmcrypt-dev \
         mysql-client \
