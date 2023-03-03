@@ -1,8 +1,0 @@
-[template]
-src = "supervisor.tmpl"
-dest = "/home/deploy/supervisor.d/runner.ini"
-owner = "deploy"
-mode = "0644"
-keys = [
-    "/supervisor-config"
-]
