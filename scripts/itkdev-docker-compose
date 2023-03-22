@@ -509,8 +509,7 @@ phpfpm:
       …
       - PHP_IDE_CONFIG=serverName=localhost
 
-and define "localhost" as a server in PhpStorm (Preferences > Languages &
-Frameworks > PHP > Servers):
+and define "localhost" as a server in PhpStorm (Preferences > PHP > Servers):
 
 Name: localhost
 Host: localhost
@@ -526,8 +525,8 @@ EOF
     ;;
 
   xdebug3)
-    PHP_XDEBUG_MODE=debug \
-    PHP_XDEBUG_WITH_REQUEST=yes \
+    XDEBUG_MODE=debug \
+    XDEBUG_WITH_REQUEST=yes \
     docker_compose up -d
 
     cat <<'EOF' | sed "s|«project directory»|$PWD|"
@@ -539,13 +538,12 @@ To debug from the command line, add `PHP_IDE_CONFIG=serverName=localhost` to the
 
 # docker-compose.yml
 phpfpm:
-    image: itkdev/php7.2-fpm:latest
+    image: itkdev/php8.1-fpm:latest
     environment:
       …
       - PHP_IDE_CONFIG=serverName=localhost
 
-and define "localhost" as a server in PhpStorm (Preferences > Languages &
-Frameworks > PHP > Servers):
+and define "localhost" as a server in PhpStorm (Preferences > PHP > Servers):
 
 Name: localhost
 Host: localhost
