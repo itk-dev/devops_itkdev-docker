@@ -4,10 +4,10 @@ version: '3'
 networks:
   frontend:
     external: true
-    
+
 services:
   traefik:
-    image: traefik:v2.6
+    image: traefik:v2.9
     container_name: traefik
     restart: unless-stopped
     security_opt:
@@ -15,9 +15,9 @@ services:
     networks:
       - frontend
     ports:
-      - 80:80
-      - 8080:8080
-      - 443:443
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - $PWD/traefik.yml:/traefik.yml:ro
