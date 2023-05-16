@@ -1,4 +1,4 @@
-# itk-version: 3.0.0
+# itk-version: 3.1.0
 version: "3"
 
 networks:
@@ -30,9 +30,12 @@ services:
     image: itkdev/php7.0-fpm:latest
     networks:
       - app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - PHP_XDEBUG_REMOTE_ENABLE=${PHP_XDEBUG_REMOTE_ENABLE:-0}
-      - PHP_MAIL=1
+      # Uncomment below to enable mailhog.
+      # - PHP_SENDMAIL_PATH=/usr/local/bin/mhsendmail --smtp-addr="mailhog:1025"
       - PHP_MAX_EXECUTION_TIME=60
       - PHP_MEMORY_LIMIT=256M
       - DOCKER_HOST_DOMAIN=${COMPOSE_DOMAIN}
