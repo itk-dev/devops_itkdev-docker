@@ -175,6 +175,12 @@ Commands:
   traefik:open
                 Open the administrative UI for træfik.
 
+  mail:url
+                URL for the test mail web interface.
+
+  mail:open
+                Open test mail web interface in default browser.
+
   mailhog:url
                 URL for the mailhog web-interface.
 
@@ -473,16 +479,27 @@ EOF
 
   traefik:url)
     label=$(docker inspect --format '{{ index .Config.Labels "traefik.http.routers.traefik.rule"}}' traefik)
-    url=$(echo "${label}" | sed -n 's/.*\`\(.*\)\`.*/\1/p')
+    url=$(echo "${label}" | sed -n 's/[^(]*(.\(.*\).)/\1/p')
     echo http://${url}:8080;
     ;;
 
+  mail:url)
+    url="http://${COMPOSE_DOMAIN}:$(docker_compose port mail 8025 | cut -d: -f2)"
+    echo $url
+    ;;
+
+  mail:open)
+    open "$(itkdev-docker-compose mail:url)"
+    ;;
+
   mailhog:url)
+    echo "Deprecated: Use mail:url"
     url=http://${COMPOSE_DOMAIN}:$(docker_compose port mailhog 8025 | cut -d: -f2)
     echo $url
     ;;
 
   mailhog:open)
+    echo "Deprecated: Use mail:open"
     open $(itkdev-docker-compose mailhog:url)
     ;;
 
