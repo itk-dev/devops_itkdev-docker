@@ -551,7 +551,7 @@ EOF
 
 ================================================================================
 
-Make dure that `PHP_IDE_CONFIG=serverName=localhost` is set in the `phpfpm`
+Make sure that `PHP_IDE_CONFIG=serverName=localhost` is set in the `phpfpm`
 service environment:
 
 # docker-compose.yml
@@ -579,7 +579,8 @@ project" in PhpStorm (Preferences > Languages & Frameworks > PHP > Debug).
 
 Install https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug
 
-Add a configuration in `.vscode/launch.json`:
+Add a configuration in `.vscode/launch.json` with `pathMappings` (Run > Add
+Configuration… > "PHP: Listen for Xdebug"):
 
 {
     …
