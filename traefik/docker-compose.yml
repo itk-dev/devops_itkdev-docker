@@ -11,6 +11,7 @@ networks:
 services:
   socket-proxy:
     image: itkdev/docker-socket-proxy
+    user: root
     container_name: socket-proxy
     restart: unless-stopped
     volumes:
