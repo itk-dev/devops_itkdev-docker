@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-VERSION=2.0.0
+VERSION=3.0.0
 set -o errexit -o errtrace -o noclobber -o nounset -o pipefail
 IFS=$'\n\t'
 
@@ -105,26 +105,6 @@ EOF
   fi
 }
 
-function enableNFS {
-  echo "Setting up NFS..."
-  U=`id -u`
-  G=`id -g`
-
-  LINE="/System/Volumes/Data/Users -alldirs -mapall=$U:$G localhost"
-  FILE=/etc/exports
-  sudo touch $FILE
-  grep -qF -- "$LINE" "$FILE" || sudo echo "$LINE" | sudo tee -a $FILE > /dev/null
-
-  LINE="nfs.server.mount.require_resv_port = 0"
-  FILE=/etc/nfs.conf
-  grep -qF -- "$LINE" "$FILE" || sudo echo "$LINE" | sudo tee -a $FILE > /dev/null
-
-  echo "Restarting nfsd..."
-  sudo nfsd restart
-
-  echo "You should restart docker to ensure NFS mounts works..."
-}
-
 bold=$(tput bold)
 normal=$(tput sgr0)
 
@@ -151,9 +131,6 @@ Commands:
                 the vendor/bin/drush command is run inside the phpfpm
                 container. Otherwise, the drush container is used to
                 run the command.
-
-  nfs:enable
-                Enable support for NFS shares (performance boost on Macs)
 
   sync
                 Sync both database and files.
@@ -198,6 +175,12 @@ Commands:
   traefik:open
                 Open the administrative UI for træfik.
 
+  mail:url
+                URL for the test mail web interface.
+
+  mail:open
+                Open test mail web interface in default browser.
+
   mailhog:url
                 URL for the mailhog web-interface.
 
@@ -219,6 +202,9 @@ Commands:
   composer
                 Run composer command inside phpfpm container
 
+  php
+                Run php command inside phpfpm container
+
   bin/*
   vendor/bin/*
                 Run command command inside phpfpm container
@@ -230,7 +216,7 @@ Commands:
                 Display this tool's current version
 
   *
-                Pass command and arguments to `docker-compose` and
+                Pass command and arguments to `docker compose` and
                 hope for the best.
 
 Configuration:
@@ -272,12 +258,6 @@ if [[ "$#" -gt "0" && "$1" == "template:install" ]]; then
   exit
 fi
 
-# Allow nfs:enable without existence of docker-compose.yml.
-if [[ "$#" -gt "0" && "$1" == "nfs:enable" ]]; then
-  enableNFS
-  exit
-fi
-
 # Allow traefik:start without existence of .env
 if [[ "$#" -gt "0" && "$1" == "traefik:start" ]]; then
   if [ "$(docker inspect -f '{{.State.Running}}' dory_dnsmasq 2>/dev/null)" == "true" ]; then
@@ -285,13 +265,13 @@ if [[ "$#" -gt "0" && "$1" == "traefik:start" ]]; then
     exit 22;
   fi
   docker network inspect frontend >/dev/null 2>&1 || docker network create --driver=bridge --attachable --internal=false frontend
-  $(cd ${script_dir}/../traefik/; docker-compose up -d)
+  $(cd ${script_dir}/../traefik/; docker compose up -d)
   exit
 fi
 
 # Allow traefik:stop without existence of .env
 if [[ "$#" -gt "0" && "$1" == "traefik:stop" ]]; then
-  $(cd ${script_dir}/../traefik/; docker-compose down --volumes)
+  $(cd ${script_dir}/../traefik/; docker compose down --volumes)
   exit
 fi
 
@@ -375,11 +355,11 @@ if [ ! "$is_treafik_running" == "true" ] && [ ! "$is_dory_running" == "true" ]; 
   (>&2 echo "${bold}Reverse proxy has not been started. Hostname will not be resolved to containers and not all commands will work correctly.${normal}")
 fi
 
-# Helper function to call `docker-compose` in the right context
+# Helper function to call `docker compose` in the right context
 docker_compose () {
-    # Note: Apparently, using --project-directory or --file options for `docker-compose` will break use of `$PWD` in
-    # docker-compose.yml. Therefore, we `cd` before running `docker-compose` command.
-    (cd "$docker_compose_dir" && COMPOSE_DOMAIN=${COMPOSE_DOMAIN} docker-compose "$@")
+    # Note: Apparently, using --project-directory or --file options for `docker compose` will break use of `$PWD` in
+    # docker-compose.yml. Therefore, we `cd` before running `docker compose` command.
+    (cd "$docker_compose_dir" && COMPOSE_DOMAIN=${COMPOSE_DOMAIN} docker compose "$@")
 }
 
 cmd="$1"
@@ -499,16 +479,27 @@ EOF
 
   traefik:url)
     label=$(docker inspect --format '{{ index .Config.Labels "traefik.http.routers.traefik.rule"}}' traefik)
-    url=$(echo "${label}" | sed -n 's/.*\`\(.*\)\`.*/\1/p')
+    url=$(echo "${label}" | sed -n 's/[^(]*(.\(.*\).)/\1/p')
     echo http://${url}:8080;
     ;;
 
+  mail:url)
+    url="http://${COMPOSE_DOMAIN}:$(docker_compose port mail 8025 | cut -d: -f2)"
+    echo $url
+    ;;
+
+  mail:open)
+    open "$(itkdev-docker-compose mail:url)"
+    ;;
+
   mailhog:url)
+    echo "Deprecated: Use mail:url"
     url=http://${COMPOSE_DOMAIN}:$(docker_compose port mailhog 8025 | cut -d: -f2)
     echo $url
     ;;
 
   mailhog:open)
+    echo "Deprecated: Use mail:open"
     open $(itkdev-docker-compose mailhog:url)
     ;;
 
@@ -517,7 +508,7 @@ EOF
     ;;
 
   xdebug2)
-    PHP_XDEBUG=1 \
+    PHP_XDEBUG_REMOTE_ENABLE=1 \
     PHP_XDEBUG_REMOTE_AUTOSTART=1 \
     docker_compose up -d
 
@@ -552,34 +543,60 @@ EOF
     ;;
 
   xdebug3)
-    XDEBUG_MODE=debug \
-    XDEBUG_SESSION=1 \
+    PHP_XDEBUG_MODE=debug \
+    PHP_XDEBUG_WITH_REQUEST=yes \
     docker_compose up -d
 
     cat <<'EOF' | sed "s|«project directory»|$PWD|"
 
 ================================================================================
 
-To debug from the command line, add `PHP_IDE_CONFIG=serverName=localhost` to the
-`phpfpm` environment:
+Make sure that `PHP_IDE_CONFIG=serverName=localhost` is set in the `phpfpm`
+service environment:
 
 # docker-compose.yml
 phpfpm:
-    image: itkdev/php7.2-fpm:latest
+    image: …
     environment:
       …
       - PHP_IDE_CONFIG=serverName=localhost
 
-and define "localhost" as a server in PhpStorm (Preferences > Languages &
-Frameworks > PHP > Servers):
+# PhpStorm
+
+Open Preferences > PHP > Servers and define "localhost" as a server:
 
 Name: localhost
 Host: localhost
+Port: 8080
+Debugger: Xdebug
 Path mapping: «project directory» → /app
 
 You may also want to uncheck "Force break at first line when no path mapping
 specified" and/or "Force break at first line when a script is outside the
 project" in PhpStorm (Preferences > Languages & Frameworks > PHP > Debug).
+
+# VS Code
+
+Install https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug
+
+Add a configuration in `.vscode/launch.json` with `pathMappings` (Run > Add
+Configuration… > "PHP: Listen for Xdebug"):
+
+{
+    …
+    "configurations": [
+        …,
+        {
+            "name": "Listen for Xdebug",
+            "type": "php",
+            "request": "launch",
+            "port": 9003,
+            "pathMappings": {
+                "/app": "${workspaceFolder}"
+            }
+        }
+    ]
+}
 
 ================================================================================
 
@@ -617,6 +634,10 @@ EOF
 
   composer)
     docker_compose exec phpfpm composer "$@"
+    ;;
+
+  php)
+    docker_compose exec phpfpm php "$@"
     ;;
 
   bin/*|vendor/bin/*)
