@@ -17,6 +17,31 @@ function find_script_dir {
 script_dir=$(find_script_dir)
 script_path=$script_dir/$(basename "${BASH_SOURCE[0]}")
 
+function self_update {
+  project_dir=$(cd "$script_dir/.." && pwd)
+  cd "$project_dir"
+  if ! git diff --quiet; then
+    (>&2 echo "${bold}Local changes in $project_dir.${normal} Not updating.")
+    git diff --name-status
+    exit 1
+  fi
+
+  # TODO: Should we use the master branch?
+  branch=develop
+
+  echo "${bold}Updating branch $branch …${normal}"
+
+  git fetch
+  git checkout "$branch"
+  git pull
+
+  echo "${bold}Done.${normal}"
+
+  echo
+  echo "Latest changes:"
+  git log --format="%C(auto) %h %s" -10
+}
+
 function template_install {
   local force=0
   local list=0
@@ -153,6 +178,9 @@ Commands:
                 Use `$(itkdev-docker-compose sql:connect)` to open the
                 database cli.
 
+  self:update
+                Update this script and other stuff.
+
   sql:open
                 Open database GUI and connect to MariaDB.
 
@@ -255,6 +283,13 @@ EOF
 if [[ "$#" -gt "0" && "$1" == "template:install" ]]; then
   shift
   template_install "$@"
+  exit
+fi
+
+# self:update must be run before we check for existence of
+# docker-compose.yml.
+if [[ "$#" -gt "0" && "$1" == "self:update" ]]; then
+  self_update "$@"
   exit
 fi
 
