@@ -33,6 +33,7 @@ _itkdev-docker-compose() {
               'open[Open url in default browser.]' \
               'drush[Run drush command.]' \
               'nfs\:enable[Enable NFS volume sharing.]' \
+              'self\:update[Update stuff.]' \
               'sync[Sync both database and files.]' \
               'sync\:db[Sync database base.]' \
               'sync\:files[Sync files base.]' \
