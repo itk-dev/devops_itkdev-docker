@@ -1,7 +1,8 @@
 server {
-    listen 8080;
+    listen ${NGINX_PORT};
     server_name localhost;
-    root /app/web;
+
+    root ${NGINX_WEB_ROOT};
 
     location / {
         # try to serve file directly, fallback to app.php
@@ -21,7 +22,7 @@ server {
         fastcgi_buffer_size 64k;
         fastcgi_busy_buffers_size 64k;
 
-        fastcgi_pass phpfpm:9000;
+        fastcgi_pass ${NGINX_FPM_SERVICE};
         fastcgi_split_path_info ^(.+\.php)(/.*)$;
         include fastcgi_params;
 
@@ -31,7 +32,7 @@ server {
 
     # Production
     location ~ ^/app\.php(/|$) {
-        fastcgi_pass phpfpm:9000;
+        fastcgi_pass ${NGINX_FPM_SERVICE};
         fastcgi_split_path_info ^(.+\.php)(/.*)$;
         include fastcgi_params;
 
