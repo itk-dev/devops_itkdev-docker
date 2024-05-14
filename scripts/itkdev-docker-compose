@@ -148,6 +148,12 @@ Commands:
   url [service [port]]
                 Print url to site or a service
 
+                Protip: run
+
+                  brew install jq
+
+                for improved handling of Traefik host names using jq (https://stedolan.github.io/jq/).
+
   open [service [port]]
                 Open url in default browser
 
@@ -404,27 +410,42 @@ shift
 
 case "$cmd" in
   url)
-    domain=${COMPOSE_DOMAIN}
+    service=nginx
+    port=80
     if [ "$#" -gt 0 ]; then
       service="$1"
-      port=80
 
       shift
       if [ "$#" -gt 0 ]; then
         port="$1"
         shift
       fi
-
-      domain=$(docker_compose port $service $port)
-      if [ $? -ne 0 ]; then
-        exit 1
-      elif [ -z "$domain" ]; then
-        (>&2 echo "Cannot find domain for service $service (port: $port)")
-        exit 1
-      fi
     fi
 
-    echo http://$domain
+    host=$(docker_compose port $service $port)
+    if [ $? -ne 0 ]; then
+      exit 1
+    elif [ -z "$host" ]; then
+      (>&2 echo "Cannot find host for service $service (port: $port)")
+      exit 1
+    fi
+
+    traefik_host=""
+    if command -v jq &> /dev/null; then
+      # Get traefik host from label
+      # https://stedolan.github.io/jq/manual/#test(val),test(regex;flags)
+      # https://stedolan.github.io/jq/manual/#capture(val),capture(regex;flags)
+      traefik_host=$(docker inspect --format '{{ json .Config.Labels }}' $(docker_compose ps -q $service) | jq --raw-output '. | [to_entries[] | select(.key | test("^traefik\\.http\\.routers\\..+\\.rule$")) | select(.value | test("^Host\\(`(?<host>.+)`\\)$"))] | first | .value//"" | capture("^Host\\(`(?<host>.+)`\\)$") | .host//""')
+    fi
+
+    if ! [ -z "$traefik_host" ]; then
+      host="$traefik_host"
+    elif [ "nginx" == "$service" ]; then
+      # Fall back to using COMPOSE_DOMAIN for nginx container when no Traefik host has been found.
+      host=${COMPOSE_DOMAIN}
+    fi
+
+    echo http://$host
     ;;
 
   open)
