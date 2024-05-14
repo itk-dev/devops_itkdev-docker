@@ -157,6 +157,9 @@ Commands:
                 container. Otherwise, the drush container is used to
                 run the command.
 
+  self:update
+                Update this script and other stuff.
+
   sync
                 Sync both database and files.
 
@@ -178,8 +181,8 @@ Commands:
                 Use `$(itkdev-docker-compose sql:connect)` to open the
                 database cli.
 
-  self:update
-                Update this script and other stuff.
+  sql:log
+                Log SQL queries sent to database.
 
   sql:open
                 Open database GUI and connect to MariaDB.
@@ -506,6 +509,28 @@ EOF
 
   sql:port)
     docker_compose port mariadb 3306 | cut -d: -f2
+    ;;
+
+  sql:log)
+
+    # @see https://mariadb.com/kb/en/general-query-log/
+    # Enable logging to the file mariadb.log (cf. https://mariadb.com/kb/en/general-query-log/#configuring-the-general-query-log-filename)
+    docker_compose exec --no-TTY mariadb sh -c 'mysql --user=root --password=$MYSQL_ROOT_PASSWORD db --verbose' <<< "SET GLOBAL general_log=1; SET GLOBAL general_log_file='mariadb.log';"
+    echo
+    echo "Press Ctrl-C to stop logging"
+    echo
+
+    # Needed to use `trap`
+    set +o errexit
+
+    # https://stackoverflow.com/a/11952947
+    trap " " INT
+    docker_compose exec mariadb tail -f /var/lib/mysql/mariadb.log
+    trap - INT
+
+    # Disable logging.
+    echo
+    docker_compose exec --no-TTY mariadb sh -c 'mysql --user=root --password=$MYSQL_ROOT_PASSWORD --verbose db' <<< "SET GLOBAL general_log=0;"
     ;;
 
   traefik:open)
