@@ -281,16 +281,14 @@ Configuration:
 EOF
 }
 
-# template:install must be run before we check for existence of
-# docker-compose.yml.
+# template:install must be run before we check for existence of compose file.
 if [[ "$#" -gt "0" && "$1" == "template:install" ]]; then
   shift
   template_install "$@"
   exit
 fi
 
-# self:update must be run before we check for existence of
-# docker-compose.yml.
+# self:update must be run before we check for existence of compose file.
 if [[ "$#" -gt "0" && "$1" == "self:update" ]]; then
   self_update "$@"
   exit
@@ -329,13 +327,13 @@ if [[ "$#" -gt "0" && "$1" == "dory:stop" ]]; then
   exit
 fi
 
-# Allow version without existence of docker-compose.yml.
+# Allow version without existence of compose file.
 if [[ "$#" -gt "0" && "$1" == "version" ]]; then
   echo Version: ${VERSION}
   exit
 fi
 
-# Allow help without existence of docker-compose.yml.
+# Allow help without existence of compose file.
 if [[ "$#" -gt "0" && "$1" == "--help" ]]; then
   usage
   exit
@@ -352,9 +350,10 @@ upsearch () {
   done
 }
 
-docker_compose_file=$(upsearch 'docker-compose.yml')
+COMPOSE_FILE=${COMPOSE_FILE:-docker-compose.yml}
+docker_compose_file=$(upsearch ${COMPOSE_FILE})
 if [ -z "$docker_compose_file" ]; then
-  (>&2 echo "${bold}Cannot find docker-compose.yml file${normal}")
+  (>&2 echo "${bold}Cannot find ${COMPOSE_FILE} file${normal}")
   exit 1
 fi
 
@@ -396,7 +395,7 @@ fi
 # Helper function to call `docker compose` in the right context
 docker_compose () {
     # Note: Apparently, using --project-directory or --file options for `docker compose` will break use of `$PWD` in
-    # docker-compose.yml. Therefore, we `cd` before running `docker compose` command.
+    # compose file. Therefore, we `cd` before running `docker compose` command.
     (cd "$docker_compose_dir" && COMPOSE_DOMAIN=${COMPOSE_DOMAIN} docker compose "$@")
 }
 
