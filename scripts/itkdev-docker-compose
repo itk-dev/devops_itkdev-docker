@@ -287,6 +287,86 @@ Configuration:
 EOF
 }
 
+# Start PHP service with Xdebug enabled, wait for kill signal and restart with
+# Xdebug disabled.
+function xdebug() {
+  cat <<'EOF' | sed "s|«project directory»|$PWD|"
+
+================================================================================
+
+Make sure that `PHP_IDE_CONFIG=serverName=localhost` is set in the `phpfpm`
+service environment:
+
+# docker-compose.yml
+phpfpm:
+    image: …
+    environment:
+      …
+      - PHP_IDE_CONFIG=serverName=localhost
+
+# PhpStorm
+
+Open Preferences > PHP > Servers and define "localhost" as a server:
+
+Name: localhost
+Host: localhost
+Port: 8080
+Debugger: Xdebug
+Path mapping: «project directory» → /app
+
+You may also want to uncheck "Force break at first line when no path mapping
+specified" and/or "Force break at first line when a script is outside the
+project" in PhpStorm (Preferences > Languages & Frameworks > PHP > Debug).
+
+# VS Code
+
+Install https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug
+
+Add a configuration in `.vscode/launch.json` with `pathMappings` (Run > Add
+Configuration… > "PHP: Listen for Xdebug"):
+
+{
+    …
+    "configurations": [
+        …,
+        {
+            "name": "Listen for Xdebug",
+            "type": "php",
+            "request": "launch",
+            "port": 9003,
+            "pathMappings": {
+                "/app": "${workspaceFolder}"
+            }
+        }
+    ]
+}
+
+================================================================================
+
+EOF
+
+  echo
+  echo "Starting Docker Compose with Xdebug enabled. Press Ctrl-C to disable Xdebug."
+  echo
+
+  # Needed to use `trap`
+  set +o errexit
+
+  # https://stackoverflow.com/a/11952947
+  trap " " INT
+  # Start the docker compose with Xdebug enabled
+  # @todo Should we disable logs, e.g. by sending it to /dev/null?
+  PHP_XDEBUG_MODE=debug PHP_XDEBUG_WITH_REQUEST=yes docker_compose up
+  trap - INT
+
+  # Disable Xdebug.
+  echo
+  echo "Starting Docker Compose with Xdebug disabled."
+  echo
+
+  docker_compose up --detach
+}
+
 # template:install must be run before we check for existence of compose file.
 if [[ "$#" -gt "0" && "$1" == "template:install" ]]; then
   shift
@@ -584,103 +664,15 @@ EOF
     ;;
 
   xdebug)
-    echo "Deprecated command use xdebug2 (PHP =< 7.2) or xdebug3 (PHP >= 7.3)"
-    ;;
-
-  xdebug2)
-    PHP_XDEBUG_REMOTE_ENABLE=1 \
-    PHP_XDEBUG_REMOTE_AUTOSTART=1 \
-    docker_compose up -d
-
-    cat <<'EOF' | sed "s|«project directory»|$PWD|"
-
-================================================================================
-
-To debug from the command line, add `PHP_IDE_CONFIG=serverName=localhost` to the
-`phpfpm` environment:
-
-# docker-compose.yml
-phpfpm:
-    image: itkdev/php7.2-fpm:latest
-    environment:
-      …
-      - PHP_IDE_CONFIG=serverName=localhost
-
-and define "localhost" as a server in PhpStorm (Preferences > Languages &
-Frameworks > PHP > Servers):
-
-Name: localhost
-Host: localhost
-Path mapping: «project directory» → /app
-
-You may also want to uncheck "Force break at first line when no path mapping
-specified" and/or "Force break at first line when a script is outside the
-project" in PhpStorm (Preferences > Languages & Frameworks > PHP > Debug).
-
-================================================================================
-
-EOF
+    xdebug
     ;;
 
   xdebug3)
-    PHP_XDEBUG_MODE=debug \
-    PHP_XDEBUG_WITH_REQUEST=yes \
-    docker_compose up -d
+    echo
+    echo "Deprecated command use xdebug"
+    echo
 
-    cat <<'EOF' | sed "s|«project directory»|$PWD|"
-
-================================================================================
-
-Make sure that `PHP_IDE_CONFIG=serverName=localhost` is set in the `phpfpm`
-service environment:
-
-# docker-compose.yml
-phpfpm:
-    image: …
-    environment:
-      …
-      - PHP_IDE_CONFIG=serverName=localhost
-
-# PhpStorm
-
-Open Preferences > PHP > Servers and define "localhost" as a server:
-
-Name: localhost
-Host: localhost
-Port: 8080
-Debugger: Xdebug
-Path mapping: «project directory» → /app
-
-You may also want to uncheck "Force break at first line when no path mapping
-specified" and/or "Force break at first line when a script is outside the
-project" in PhpStorm (Preferences > Languages & Frameworks > PHP > Debug).
-
-# VS Code
-
-Install https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug
-
-Add a configuration in `.vscode/launch.json` with `pathMappings` (Run > Add
-Configuration… > "PHP: Listen for Xdebug"):
-
-{
-    …
-    "configurations": [
-        …,
-        {
-            "name": "Listen for Xdebug",
-            "type": "php",
-            "request": "launch",
-            "port": 9003,
-            "pathMappings": {
-                "/app": "${workspaceFolder}"
-            }
-        }
-    ]
-}
-
-================================================================================
-
-EOF
+    xdebug
     ;;
 
   hosts:insert)
