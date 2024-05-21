@@ -411,7 +411,7 @@ shift
 case "$cmd" in
   url)
     service=nginx
-    port=80
+    port=8080
     if [ "$#" -gt 0 ]; then
       service="$1"
 
