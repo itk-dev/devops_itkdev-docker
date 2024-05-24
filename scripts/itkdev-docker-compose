@@ -6,8 +6,8 @@ bold=$(tput -Txterm-256color bold)
 normal=$(tput -Txterm-256color sgr0)
 
 # @see https://stackoverflow.com/a/54839008
-fg_black_8=$(tput setf 0)
-bg_green_8=$(tput setb 2)
+fg_black_8=$(tput setaf 0)
+bg_green_8=$(tput setab 2)
 
 function find_script_dir {
   local script=${BASH_SOURCE[0]}
