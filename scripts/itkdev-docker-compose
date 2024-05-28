@@ -193,6 +193,14 @@ Commands:
                 Use `$(itkdev-docker-compose sql:connect)` to open the
                 database cli.
 
+                Execute a SQL query from the command line:
+
+                  $(itkdev-docker-compose sql:connect) --table <<< 'SHOW TABLES'
+
+                Run a SQL script:
+
+                  $(itkdev-docker-compose sql:connect) < query.sql
+
   sql:log
                 Log SQL queries sent to database.
 
@@ -609,10 +617,8 @@ EOF
     ;;
 
   sql:connect)
-    address=$(docker_compose port mariadb 3306)
-    host=$(echo $address | cut -d: -f1)
-    port=$(echo $address | cut -d: -f2)
-    echo mysql --host=$host --port=$port --user=db --password=db db
+    db_service=mariadb
+    echo docker compose exec --no-TTY $db_service mysql --user=db --password=db db
     ;;
 
   sql:open)
