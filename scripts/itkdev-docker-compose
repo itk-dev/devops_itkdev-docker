@@ -186,20 +186,24 @@ Commands:
                 Sync files base on 'REMOTE_PATH' or 'LOCAL_PATH' in
                 the env file.
 
+  sql:cli
+                Open MySQL client to the database (named `db`) in the database
+                container (`mariadb`).
+
+                Execute a SQL query from the command line:
+
+                  itkdev-docker-compose sql:cli --table <<< 'SHOW TABLES'
+
+                Run a SQL script:
+
+                  itkdev-docker-compose sql:cli < query.sql
+
   sql:connect
                 Print mysql command for connecting to database (named
                 `db`) in the database container (`mariadb`).
 
                 Use `$(itkdev-docker-compose sql:connect)` to open the
                 database cli.
-
-                Execute a SQL query from the command line:
-
-                  $(itkdev-docker-compose sql:connect) --table <<< 'SHOW TABLES'
-
-                Run a SQL script:
-
-                  $(itkdev-docker-compose sql:connect) < query.sql
 
   sql:log
                 Log SQL queries sent to database.
@@ -572,7 +576,7 @@ case "$cmd" in
     fi
 
     if command -v pv >/dev/null 2>&1; then
-      ssh ${REMOTE_HOST} ${REMOTE_DB_DUMP_CMD} | pv | eval $(itkdev-docker-compose sql:connect)
+      ssh ${REMOTE_HOST} ${REMOTE_DB_DUMP_CMD} | pv | $script_path sql:cli
     else
       cat <<EOF
 Protip: run
@@ -581,7 +585,7 @@ Protip: run
 
 to show progress
 EOF
-      ssh ${REMOTE_HOST} ${REMOTE_DB_DUMP_CMD} | eval $(itkdev-docker-compose sql:connect)
+      ssh ${REMOTE_HOST} ${REMOTE_DB_DUMP_CMD} | $script_path sql:cli
     fi
 
     if [ ! -z "${SYNC_DB_POST_SCRIPT:-}" ]; then
@@ -616,9 +620,19 @@ EOF
     eval rsync -avz ${excludes} ${REMOTE_HOST}:${REMOTE_PATH}/ ${docker_compose_dir}/${LOCAL_PATH}
     ;;
 
+  sql:cli)
+    db_service=mariadb
+    exec_args=()
+    # @see https://stackoverflow.com/a/2456870?
+    if ! [ -t 0 ]; then
+      exec_args+=("--no-TTY")
+    fi
+    docker compose exec "${exec_args[@]}" $db_service mysql --user=db --password=db --database=db "$@"
+    ;;
+
   sql:connect)
     db_service=mariadb
-    echo docker compose exec --no-TTY $db_service mysql --user=db --password=db db
+    echo docker compose exec $db_service mysql --user=db --password=db db
     ;;
 
   sql:open)
