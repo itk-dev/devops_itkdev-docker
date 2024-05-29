@@ -9,7 +9,7 @@ _idc_completions()
   fi
 
   # Keep the suggestions in a local variable
-  local suggestions=($(compgen -W "dory:start dory:stop url open drush nfs:enable template:install traefik:start traefik:stop traefik:open traefik:url mail:open mail:url mailhog:open mailhog:url sql:connect sql:log sql:port sql:open xdebug xdebug3 hosts:insert self:update sync sync:db sync:files images:pull composer php version bin/console" -- "${COMP_WORDS[1]}"))
+  local suggestions=($(compgen -W "dory:start dory:stop url open drush nfs:enable template:install traefik:start traefik:stop traefik:open traefik:url mail:open mail:url mailhog:open mailhog:url sql:cli sql:connect sql:log sql:port sql:open xdebug xdebug3 hosts:insert self:update sync sync:db sync:files images:pull composer php version bin/console" -- "${COMP_WORDS[1]}"))
 
   COMPREPLY=("${suggestions[@]}")
 
