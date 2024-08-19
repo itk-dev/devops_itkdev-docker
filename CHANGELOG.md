@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `serversTransport.insecureSkipVerifyAdded` in Trafik config (cf.
+  <https://doc.traefik.io/traefik/routing/services/#insecureskipverify>).
+
 ### Removed
 
 - Removed `nfs` volume usage for better MacOS Ventura compatibility
