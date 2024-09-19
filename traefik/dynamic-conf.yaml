@@ -1,3 +1,10 @@
+http:
+  middlewares:
+    ITKMetricsAuth:
+      basicAuth:
+        users:
+          - 'metrics:$apr1$NN0pEsue$o.K99fyHjlf8XpOh1NA8Y.'
+
 tls:
   certificates:
     - certFile: /certs/docker.crt
