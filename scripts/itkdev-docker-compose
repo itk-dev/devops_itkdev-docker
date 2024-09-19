@@ -2,6 +2,12 @@
 VERSION=3.0.0
 set -o errexit -o errtrace -o noclobber -o nounset -o pipefail
 IFS=$'\n\t'
+bold=$(tput -Txterm-256color bold)
+normal=$(tput -Txterm-256color sgr0)
+
+# @see https://stackoverflow.com/a/54839008
+fg_black_8=$(tput setaf 0)
+bg_green_8=$(tput setab 2)
 
 function find_script_dir {
   local script=${BASH_SOURCE[0]}
@@ -16,6 +22,31 @@ function find_script_dir {
 
 script_dir=$(find_script_dir)
 script_path=$script_dir/$(basename "${BASH_SOURCE[0]}")
+
+function self_update {
+  project_dir=$(cd "$script_dir/.." && pwd)
+  cd "$project_dir"
+  if ! git diff --quiet; then
+    (>&2 echo "${bold}Local changes in $project_dir.${normal} Not updating.")
+    git diff --name-status
+    exit 1
+  fi
+
+  # TODO: Should we use the master branch?
+  branch=develop
+
+  echo "${bold}Updating branch $branch …${normal}"
+
+  git fetch
+  git checkout "$branch"
+  git pull
+
+  echo "${bold}Done.${normal}"
+
+  echo
+  echo "Latest changes:"
+  git log --format="%C(auto) %h %s" -10
+}
 
 function template_install {
   local force=0
@@ -123,6 +154,12 @@ Commands:
   url [service [port]]
                 Print url to site or a service
 
+                Protip: run
+
+                  brew install jq
+
+                for improved handling of Traefik host names using jq (https://stedolan.github.io/jq/).
+
   open [service [port]]
                 Open url in default browser
 
@@ -131,6 +168,9 @@ Commands:
                 the vendor/bin/drush command is run inside the phpfpm
                 container. Otherwise, the drush container is used to
                 run the command.
+
+  self:update
+                Update this script and other stuff.
 
   sync
                 Sync both database and files.
@@ -152,6 +192,9 @@ Commands:
 
                 Use `$(itkdev-docker-compose sql:connect)` to open the
                 database cli.
+
+  sql:log
+                Log SQL queries sent to database.
 
   sql:open
                 Open database GUI and connect to MariaDB.
@@ -189,6 +232,10 @@ Commands:
 
   xdebug
                 Boot the containers with PHP xdebug support enabled.
+
+  xdebug3
+                Boot the containers with PHP xdebug support enabled.
+                Consider using `xdebug` for an improved developer experience.
 
   hosts:insert
                 Insert the docker site url into the hosts file.
@@ -250,11 +297,102 @@ Configuration:
 EOF
 }
 
-# template:install must be run before we check for existence of
-# docker-compose.yml.
+function message_info() {
+  echo "${bg_green_8}${fg_black_8}"
+  echo
+  echo "  ""$@""  "
+  echo "${normal}"
+  echo
+}
+
+# Start PHP service with Xdebug enabled, wait for kill signal and restart with
+# Xdebug disabled.
+function xdebug() {
+  cat <<'EOF' | sed "s|«project directory»|$PWD|"
+
+================================================================================
+
+Make sure that `PHP_IDE_CONFIG=serverName=localhost` is set in the `phpfpm`
+service environment:
+
+# docker-compose.yml
+phpfpm:
+    image: …
+    environment:
+      …
+      - PHP_IDE_CONFIG=serverName=localhost
+
+# PhpStorm
+
+Open Preferences > PHP > Servers and define "localhost" as a server:
+
+Name: localhost
+Host: localhost
+Port: 8080
+Debugger: Xdebug
+Path mapping: «project directory» → /app
+
+You may also want to uncheck "Force break at first line when no path mapping
+specified" and/or "Force break at first line when a script is outside the
+project" in PhpStorm (Preferences > Languages & Frameworks > PHP > Debug).
+
+# VS Code
+
+Install https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug
+
+Add a configuration in `.vscode/launch.json` with `pathMappings` (Run > Add
+Configuration… > "PHP: Listen for Xdebug"):
+
+{
+    …
+    "configurations": [
+        …,
+        {
+            "name": "Listen for Xdebug",
+            "type": "php",
+            "request": "launch",
+            "port": 9003,
+            "pathMappings": {
+                "/app": "${workspaceFolder}"
+            }
+        }
+    ]
+}
+
+================================================================================
+
+EOF
+
+  message_info "Starting Docker Compose with Xdebug enabled. Press Ctrl-C to disable."
+
+  # Needed to use `trap`
+  set +o errexit
+
+  # https://stackoverflow.com/a/11952947
+  trap " " INT
+  # Start the docker compose with Xdebug enabled
+  # @todo Should we disable logs, e.g. by sending it to /dev/null?
+  PHP_XDEBUG_MODE=debug PHP_XDEBUG_WITH_REQUEST=yes docker_compose up
+  trap - INT
+
+  # Disable Xdebug.
+  echo
+  echo "Starting Docker Compose with Xdebug disabled."
+  echo
+
+  docker_compose up --detach
+}
+
+# template:install must be run before we check for existence of compose file.
 if [[ "$#" -gt "0" && "$1" == "template:install" ]]; then
   shift
   template_install "$@"
+  exit
+fi
+
+# self:update must be run before we check for existence of compose file.
+if [[ "$#" -gt "0" && "$1" == "self:update" ]]; then
+  self_update "$@"
   exit
 fi
 
@@ -291,13 +429,13 @@ if [[ "$#" -gt "0" && "$1" == "dory:stop" ]]; then
   exit
 fi
 
-# Allow version without existence of docker-compose.yml.
+# Allow version without existence of compose file.
 if [[ "$#" -gt "0" && "$1" == "version" ]]; then
   echo Version: ${VERSION}
   exit
 fi
 
-# Allow help without existence of docker-compose.yml.
+# Allow help without existence of compose file.
 if [[ "$#" -gt "0" && "$1" == "--help" ]]; then
   usage
   exit
@@ -314,9 +452,10 @@ upsearch () {
   done
 }
 
-docker_compose_file=$(upsearch 'docker-compose.yml')
+COMPOSE_FILE=${COMPOSE_FILE:-docker-compose.yml}
+docker_compose_file=$(upsearch ${COMPOSE_FILE})
 if [ -z "$docker_compose_file" ]; then
-  (>&2 echo "${bold}Cannot find docker-compose.yml file${normal}")
+  (>&2 echo "${bold}Cannot find ${COMPOSE_FILE} file${normal}")
   exit 1
 fi
 
@@ -358,7 +497,7 @@ fi
 # Helper function to call `docker compose` in the right context
 docker_compose () {
     # Note: Apparently, using --project-directory or --file options for `docker compose` will break use of `$PWD` in
-    # docker-compose.yml. Therefore, we `cd` before running `docker compose` command.
+    # compose file. Therefore, we `cd` before running `docker compose` command.
     (cd "$docker_compose_dir" && COMPOSE_DOMAIN=${COMPOSE_DOMAIN} docker compose "$@")
 }
 
@@ -367,27 +506,42 @@ shift
 
 case "$cmd" in
   url)
-    domain=${COMPOSE_DOMAIN}
+    service=nginx
+    port=8080
     if [ "$#" -gt 0 ]; then
       service="$1"
-      port=80
 
       shift
       if [ "$#" -gt 0 ]; then
         port="$1"
         shift
       fi
-
-      domain=$(docker_compose port $service $port)
-      if [ $? -ne 0 ]; then
-        exit 1
-      elif [ -z "$domain" ]; then
-        (>&2 echo "Cannot find domain for service $service (port: $port)")
-        exit 1
-      fi
     fi
 
-    echo http://$domain
+    host=$(docker_compose port $service $port)
+    if [ $? -ne 0 ]; then
+      exit 1
+    elif [ -z "$host" ]; then
+      (>&2 echo "Cannot find host for service $service (port: $port)")
+      exit 1
+    fi
+
+    traefik_host=""
+    if command -v jq &> /dev/null; then
+      # Get traefik host from label
+      # https://stedolan.github.io/jq/manual/#test(val),test(regex;flags)
+      # https://stedolan.github.io/jq/manual/#capture(val),capture(regex;flags)
+      traefik_host=$(docker inspect --format '{{ json .Config.Labels }}' $(docker_compose ps -q $service) | jq --raw-output '. | [to_entries[] | select(.key | test("^traefik\\.http\\.routers\\..+\\.rule$")) | select(.value | test("^Host\\(`(?<host>.+)`\\)$"))] | first | .value//"" | capture("^Host\\(`(?<host>.+)`\\)$") | .host//""')
+    fi
+
+    if ! [ -z "$traefik_host" ]; then
+      host="$traefik_host"
+    elif [ "nginx" == "$service" ]; then
+      # Fall back to using COMPOSE_DOMAIN for nginx container when no Traefik host has been found.
+      host=${COMPOSE_DOMAIN}
+    fi
+
+    echo http://$host
     ;;
 
   open)
@@ -473,6 +627,28 @@ EOF
     docker_compose port mariadb 3306 | cut -d: -f2
     ;;
 
+  sql:log)
+
+    # @see https://mariadb.com/kb/en/general-query-log/
+    # Enable logging to the file mariadb.log (cf. https://mariadb.com/kb/en/general-query-log/#configuring-the-general-query-log-filename)
+    docker_compose exec --no-TTY mariadb sh -c 'mysql --user=root --password=$MYSQL_ROOT_PASSWORD db --verbose' <<< "SET GLOBAL general_log=1; SET GLOBAL general_log_file='mariadb.log';"
+    echo
+    echo "Press Ctrl-C to stop logging"
+    echo
+
+    # Needed to use `trap`
+    set +o errexit
+
+    # https://stackoverflow.com/a/11952947
+    trap " " INT
+    docker_compose exec mariadb tail -f /var/lib/mysql/mariadb.log
+    trap - INT
+
+    # Disable logging.
+    echo
+    docker_compose exec --no-TTY mariadb sh -c 'mysql --user=root --password=$MYSQL_ROOT_PASSWORD --verbose db' <<< "SET GLOBAL general_log=0;"
+    ;;
+
   traefik:open)
     open $($script_path traefik:url)
     ;;
@@ -504,42 +680,7 @@ EOF
     ;;
 
   xdebug)
-    echo "Deprecated command use xdebug2 (PHP =< 7.2) or xdebug3 (PHP >= 7.3)"
-    ;;
-
-  xdebug2)
-    PHP_XDEBUG_REMOTE_ENABLE=1 \
-    PHP_XDEBUG_REMOTE_AUTOSTART=1 \
-    docker_compose up -d
-
-    cat <<'EOF' | sed "s|«project directory»|$PWD|"
-
-================================================================================
-
-To debug from the command line, add `PHP_IDE_CONFIG=serverName=localhost` to the
-`phpfpm` environment:
-
-# docker-compose.yml
-phpfpm:
-    image: itkdev/php7.2-fpm:latest
-    environment:
-      …
-      - PHP_IDE_CONFIG=serverName=localhost
-
-and define "localhost" as a server in PhpStorm (Preferences > Languages &
-Frameworks > PHP > Servers):
-
-Name: localhost
-Host: localhost
-Path mapping: «project directory» → /app
-
-You may also want to uncheck "Force break at first line when no path mapping
-specified" and/or "Force break at first line when a script is outside the
-project" in PhpStorm (Preferences > Languages & Frameworks > PHP > Debug).
-
-================================================================================
-
-EOF
+    xdebug
     ;;
 
   xdebug3)
@@ -601,6 +742,9 @@ Configuration… > "PHP: Listen for Xdebug"):
 ================================================================================
 
 EOF
+
+    message_info "Consider using \`$(basename $script_path) xdebug\` for an improved developer experience."
+
     ;;
 
   hosts:insert)
