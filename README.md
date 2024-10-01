@@ -48,7 +48,9 @@ brew install dory
 The [`templates`](templates/) directory contains templates for adding
 the itkdev `docker-compose` setup to new or exiting projects.
 
-`rsync -avz templates/<TYPE>/ <PATH TO HTDOCS FOLDER>`
+```sh
+rsync -avz templates/<TYPE>/ <PATH TO HTDOCS FOLDER>
+```
 
 Also create an `.env` file beside the `docker-compose.yml` file that contains
 `COMPOSE_PROJECT_NAME=<NAME>` to namespace the docker setup for the projekt.
