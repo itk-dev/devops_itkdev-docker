@@ -13,6 +13,12 @@ services:
       - app
     ports:
       - '3306'
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_USER=db
@@ -39,8 +45,10 @@ services:
       - COMPOSER_VERSION=2
       - PHP_IDE_CONFIG=serverName=localhost
     depends_on:
-      - mariadb
-      - memcached
+      mariadb:
+        condition: service_healthy
+      memcached:
+        condition: service_healthy
     volumes:
       - .:/app
       - drush-cache:/root/.drush
@@ -76,6 +84,10 @@ services:
       - app
     ports:
       - '11211'
+    healthcheck:
+      test: echo "version" | nc -vn -w 1 127.0.0.1 11211
+      interval: 10s
+      retries: 60
     environment:
       - MEMCACHED_CACHE_SIZE=64
 
