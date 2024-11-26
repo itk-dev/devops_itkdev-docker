@@ -37,6 +37,7 @@ _itkdev-docker-compose() {
               'sync[Sync both database and files.]' \
               'sync\:db[Sync database base.]' \
               'sync\:files[Sync files base.]' \
+              'sql\:cli[Open mysql cli.]' \
               'sql\:connect[Print mysql command for connecting to database.]' \
               'sql\:log[Log SQL queries sent to database.]' \
               'sql\:port[Display the exposed MariaDB SQL server port.]' \
