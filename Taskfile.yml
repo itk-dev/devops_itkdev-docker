@@ -1,0 +1,58 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GITHUB_ACTIONS_TEMPLATES_HEADER: |
+    # Github Actions templates
+
+    This repository contains a number of [GitHub
+    Actions](https://docs.github.com/en/actions) workflow template files that
+    are copied to a project when running `itkdev-docker-compose
+    template:install`. Any changes to the workflows should be made in [this
+    repository](%THIS_REPOSITORY%) and then the project template must be updated
+    to match the new templates.
+
+  GITHUB_ACTIONS_TEMPLATES_FOOTER: |
+
+tasks:
+  github-actions:documentation:update:
+    desc: "Update GitHub Actions template documentation"
+    sources:
+      - github/workflows/*.yaml
+    generates:
+      - docs/github-action-templates.md
+    cmds:
+      - mkdir -p docs
+      - |
+        echo '{{.GITHUB_ACTIONS_TEMPLATES_HEADER}}' > docs/github-action-templates.md
+      - |
+        for f in github/workflows/*.yaml; do
+          echo "" >> docs/github-action-templates.md
+          echo "---" >> docs/github-action-templates.md
+          echo "" >> docs/github-action-templates.md
+
+          echo "[$f]($f)" >> docs/github-action-templates.md
+
+          cat "$f" | grep -E '^###( |$)' | sed -E -e 's/^### ?//' >> docs/github-action-templates.md
+        done
+      - |
+        echo "{{.GITHUB_ACTIONS_TEMPLATES_FOOTER}}" >> docs/github-action-templates.md
+      # Link to clean up.
+      - task lint:markdown -- docs/github-action-templates.md
+
+  lint:markdown:
+    desc: "Lint Markdown"
+    cmds:
+      # itkdev/markdownlint does not support `--ignore-path`
+      - docker run --rm --volume "$PWD":/md peterdavehello/markdownlint markdownlint --config config/markdownlint-cli/.markdownlint.jsonc --ignore-path config/markdownlint-cli/.markdownlintignore {{.GLOB}} --fix
+      - docker run --rm --volume "$PWD":/md peterdavehello/markdownlint markdownlint --config config/markdownlint-cli/.markdownlint.jsonc --ignore-path config/markdownlint-cli/.markdownlintignore {{.GLOB}}
+    vars:
+      # We use a block scalar (https://yaml-multiline.info/#block-scalars) here to make escaping (a little) easier.
+      GLOB: >-
+        {{.CLI_ARGS | default "\\'**/*.md\\'"}}
+
+  default:
+    cmds:
+      - task --list
+    silent: true

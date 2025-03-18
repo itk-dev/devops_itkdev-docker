@@ -1,0 +1,26 @@
+on: pull_request
+name: Review
+jobs:
+  check-github-actions-documentation:
+    runs-on: ubuntu-latest
+    name: Check that Github Actions documentation is up to date
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-task@v2
+      - run: |
+          task github-actions:documentation:update
+      # Check that documentation has not changed.
+      - run: |
+          git diff --exit-code docs/github-action-templates.md
+
+  lint-markdown:
+    runs-on: ubuntu-latest
+    name: Lint Markdown
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-task@v2
+      - run: |
+          task lint:markdown
+      # Check that nothing has changed.
+      - run: |
+          git diff --exit-code
