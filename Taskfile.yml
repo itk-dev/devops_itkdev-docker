@@ -44,13 +44,13 @@ tasks:
   lint:markdown:
     desc: "Lint Markdown"
     cmds:
-      # itkdev/markdownlint does not support `--ignore-path`
-      - docker run --rm --volume "$PWD":/md peterdavehello/markdownlint markdownlint --config config/markdownlint-cli/.markdownlint.jsonc --ignore-path config/markdownlint-cli/.markdownlintignore {{.GLOB}} --fix
-      - docker run --rm --volume "$PWD":/md peterdavehello/markdownlint markdownlint --config config/markdownlint-cli/.markdownlint.jsonc --ignore-path config/markdownlint-cli/.markdownlintignore {{.GLOB}}
+      # I cannot get itkdev/markdownlint to work as expected, i.e. as peterdavehello/markdownlint does …
+      - docker run --rm --volume "$PWD":/md peterdavehello/markdownlint markdownlint {{.GLOB}} --fix
+      - docker run --rm --volume "$PWD":/md peterdavehello/markdownlint markdownlint {{.GLOB}}
     vars:
       # We use a block scalar (https://yaml-multiline.info/#block-scalars) here to make escaping (a little) easier.
       GLOB: >-
-        {{.CLI_ARGS | default "\\'**/*.md\\'"}}
+        {{.CLI_ARGS | default "'**/*.md'"}}
 
   default:
     cmds:
