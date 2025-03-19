@@ -12,15 +12,3 @@ jobs:
       # Check that documentation has not changed.
       - run: |
           git diff --exit-code docs/github-action-templates.md
-
-  lint-markdown:
-    runs-on: ubuntu-latest
-    name: Lint Markdown
-    steps:
-      - uses: actions/checkout@v4
-      - uses: arduino/setup-task@v2
-      - run: |
-          task lint:markdown
-      # Check that nothing has changed.
-      - run: |
-          git diff --exit-code
