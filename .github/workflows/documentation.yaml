@@ -12,3 +12,15 @@ jobs:
       # Check that documentation has not changed.
       - run: |
           git diff --exit-code docs/github-action-templates.md
+
+  check-github-actions-template-headers:
+    runs-on: ubuntu-latest
+    name: Check that Github Actions template headers are up to date
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-task@v2
+      - run: |
+          task github-actions:update-headers --yes
+      # Check that files hav not changed.
+      - run: |
+          git diff --exit-code github/workflows/
