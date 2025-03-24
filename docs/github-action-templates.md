@@ -53,7 +53,8 @@ pull request).
 
 1. A docker compose service named `phpfpm` can be run and `composer` can be
    run inside the `phpfpm` service.
-2. The Drupal site can be installed from existing config.
+2. The docker setup contains a database container and other the dependent services and the
+3. The Drupal site can be installed from existing config.
 
 ---
 
