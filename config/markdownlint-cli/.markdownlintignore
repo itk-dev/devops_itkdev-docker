@@ -1,7 +1,7 @@
 # https://github.com/igorshubovych/markdownlint-cli?tab=readme-ov-file#ignoring-files
 vendor/
 node_modules/
-
+LICENSE.md
 # Drupal
 web/*.md
 web/core/
