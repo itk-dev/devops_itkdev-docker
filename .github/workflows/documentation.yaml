@@ -3,7 +3,7 @@ on: pull_request
 name: Review
 
 env:
-  COMPOSE_USER: root
+  COMPOSE_USER: runner
 
 jobs:
   check-github-actions-documentation:
@@ -12,11 +12,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: arduino/setup-task@v2
+        # https://github.com/arduino/setup-task/tree/56d0cc033e3cecc5f07a291fdd39f29388d21800?tab=readme-ov-file#repo-token
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # https://github.com/mxschmitt/action-tmate?tab=readme-ov-file#manually-triggered-debug
+      # Enable tmate debugging if debug logging is enabled (cf.
+      # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/accessing-contextual-information-about-workflow-runs#runner-context)
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: 1 == runner.debug
+
       - run: |
           task github-actions:documentation:update
+
       # Check that documentation has not changed.
       - run: |
-          git diff --exit-code docs/github-action-templates.md
+          task github-actions:documentation:diff
 
   check-github-actions-template-headers:
     runs-on: ubuntu-latest
@@ -24,8 +36,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: arduino/setup-task@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - run: |
-          task github-actions:update-headers --yes
+          task github-actions:template-headers:update --yes
       # Check that files hav not changed.
       - run: |
           git diff --exit-code github/workflows/
