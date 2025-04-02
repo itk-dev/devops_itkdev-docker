@@ -2,7 +2,7 @@
 # github/workflows/markdown.yaml in
 # https://github.com/itk-dev/devops_itkdev-docker if need be.
 
-### ## Markdown
+### ### Markdown
 ###
 ### Uses [itkdev/markdownlint](https://hub.docker.com/r/itkdev/markdownlint) to
 ### link all Markdown files (`**/*.md`) in the project.
