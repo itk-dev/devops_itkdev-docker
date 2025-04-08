@@ -40,6 +40,54 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - run: |
           task github-actions:template-headers:update --yes
-      # Check that files hav not changed.
+      # Check that files have not changed.
       - run: |
-          git diff --exit-code github/workflows/
+          git diff --exit-code
+
+  check-config-file-headers:
+    runs-on: ubuntu-latest
+    name: Check that config file headers are up to date
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-task@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          task github-actions:config-headers:update --yes
+      # Check that files have not changed.
+      - run: |
+          git diff --exit-code
+
+  check-links:
+    runs-on: ubuntu-latest
+    name: Check that workflow and config file links are up to date
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-task@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          task github-actions:link --yes
+      # Check that files have not changed.
+      - run: |
+          git diff --exit-code
+
+  lint-markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-task@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          SKIP_FIX=1 task lint:markdown
+
+  lint-shell-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/setup-task@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          SKIP_FIX=1 task lint:shell-script
