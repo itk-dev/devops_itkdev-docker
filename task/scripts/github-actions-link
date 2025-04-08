@@ -3,7 +3,7 @@ set -o errexit -o errtrace -o noclobber -o nounset -o pipefail
 IFS=$'\n\t'
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-project_dir=$(cd "$(dirname "$script_dir")" && pwd)
+project_dir=$(cd "$(dirname "$script_dir")/.." && pwd)
 
 cd "$project_dir" || exit
 
@@ -11,7 +11,7 @@ cd "$project_dir" || exit
 function strip-project-type() {
   name=$1
 
-  if [[ "$name" =~ ^(drupal-|symfony-)(.+) ]]; then
+  if [[ "$name" =~ ^(drupal|symfony)/(.+) ]]; then
     name="${BASH_REMATCH[2]}"
   fi
 
@@ -36,19 +36,19 @@ for template_dir in templates/*; do
     exit 1
   fi
 
-  for f in github/workflows/*.yaml; do
-    file_name=$(basename "$f")
+  for f in $(find github/workflows/ -name '*.yaml' | sort); do
     source_file_name=''
-    if [[ "$file_name" =~ ^drupal- ]]; then
+    # Note: / is NOT a regex delimiter here, but an actual /, i.e. a directory separator.
+    if [[ "$f" =~ /drupal/ ]]; then
       if [[ "$project_type" == "drupal" ]]; then
-        source_file_name="$file_name"
+        source_file_name="$(basename $(dirname "$f"))/$(basename "$f")"
       fi
-    elif [[ "$file_name" =~ ^symfony- ]]; then
+    elif [[ "$f" =~ /symfony/ ]]; then
       if [[ "$project_type" == "symfony" ]]; then
-        source_file_name="$file_name"
+        source_file_name="$(basename $(dirname "$f"))/$(basename "$f")"
       fi
     else
-      source_file_name="$file_name"
+      source_file_name=$(basename "$f")
     fi
 
     if [[ -n "$source_file_name" ]]; then
@@ -81,20 +81,4 @@ for template_dir in templates/*; do
 
   find "$template_dir" -type l -ls
   echo
-done
-
-# Generate Mermaid graph showing links
-mermaid_file_name="$script_dir/links.mermaid"
-
-cat >| "$mermaid_file_name" <<'EOF'
-graph TD
-EOF
-for link in $(find templates -type l); do
-  link_id=$(base64 <<< $link)
-  link_id=${link_id//=}
-
-  target=$(readlink $link)
-  target_id=$(base64 <<< $target)
-  target_id=${target_id//=}
-  echo "  $link_id[$link] --> $target_id[$target]" >> "$mermaid_file_name"
 done
