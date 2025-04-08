@@ -29,6 +29,16 @@ tasks:
       GLOB: >-
         {{.CLI_ARGS | default "'**/*.md'"}}
 
+  lint:shell-script:
+    desc: "Lint shell scripts"
+    cmds:
+      # https://github.com/koalaman/shellcheck?tab=readme-ov-file#installing
+      - docker run --rm --volume "$PWD:"/mnt koalaman/shellcheck:stable {{.GLOB}}
+    vars:
+      # We use a block scalar (https://yaml-multiline.info/#block-scalars) here to make escaping (a little) easier.
+      GLOB: >-
+        {{.CLI_ARGS | default "task/scripts/*"}}
+
   default:
     cmds:
       - task --list

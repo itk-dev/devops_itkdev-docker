@@ -15,7 +15,7 @@ function strip-project-type() {
     name="${BASH_REMATCH[2]}"
   fi
 
-  echo $name
+  echo "$name"
 }
 
 find templates -type l -delete
@@ -41,11 +41,11 @@ for template_dir in templates/*; do
     # Note: / is NOT a regex delimiter here, but an actual /, i.e. a directory separator.
     if [[ "$f" =~ /drupal/ ]]; then
       if [[ "$project_type" == "drupal" ]]; then
-        source_file_name="$(basename $(dirname "$f"))/$(basename "$f")"
+        source_file_name="$(basename "$(dirname "$f")")/$(basename "$f")"
       fi
     elif [[ "$f" =~ /symfony/ ]]; then
       if [[ "$project_type" == "symfony" ]]; then
-        source_file_name="$(basename $(dirname "$f"))/$(basename "$f")"
+        source_file_name="$(basename "$(dirname "$f")")/$(basename "$f")"
       fi
     else
       source_file_name=$(basename "$f")
