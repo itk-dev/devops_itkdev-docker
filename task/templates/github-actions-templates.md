@@ -11,6 +11,7 @@ to match the new templates.
 * Some configuration based on template type (drupal, symfony)
 
 ## Templates
+
 <!--insert:templates:here-->
 
 ---

@@ -3,7 +3,7 @@
 version: '3'
 
 includes:
-  github-actions: ./task/Tasfile.github-actions.yml
+  github-actions: ./task/Taskfile.github-actions.yml
 
 vars:
   GITHUB_ACTIONS_TEMPLATES_HEADER: |
