@@ -7,8 +7,14 @@ to match the new templates.
 
 ## Naming conventions
 
-* Named after what a tool is concerned with, not how it's concerned with it.
-* Some configuration based on template type (drupal, symfony)
+* A workflow file is named after what it is _concerned_ with, not _how_ it's concerned with it and which tools are
+  actually used, i.e. we have a [`markdown.yaml`](github/workflows/markdown.yaml) file and not a `markdownlint.yaml`
+  file.
+* Some workflows are specific to a project type, currently `drupal` or `symfony`, and these sit in a project type
+  subfolder, e.g. `github/workflows/drupal`.
+* Some tools require configuration files, and these sit in the `config` folder. Some tool configuration may be specific
+  to a project type (or make sence only for a specific project type), and these specific config files sit in a project
+  type subfolder, e.g. `config/drupal/php/.phpcs.xml.dist` and `config/drupal/twig/.twig-cs-fixer.dist.php`
 
 ## Templates
 
