@@ -119,19 +119,21 @@ function template_install {
     if [ -z "$project_name" ]; then
       project_name=$project_name_default
     fi
-    read -p "Domain (optional)? " -e domain
+    default_domain="$project_name_default.local.itkdev.dk"
+    read -p "Domain [$default_domain]? " -e domain
     cat > $target_dir/.env <<EOF
 COMPOSE_PROJECT_NAME=$project_name
-COMPOSE_DOMAIN=$domain
+COMPOSE_DOMAIN=${domain:-$default_domain}
 ITKDEV_TEMPLATE=$name
 EOF
   else
 cat <<EOF
 
-${bold}Edit .env and make sure that COMPOSE_PROJECT_NAME and, optionally, COMPOSE_DOMAIN is set${normal}, e.g.
+${bold}Edit .env and make sure that COMPOSE_PROJECT_NAME, COMPOSE_DOMAIN, and ITKDEV_TEMPLATE are set${normal}, e.g.
 
 COMPOSE_PROJECT_NAME=$project_name_default
 COMPOSE_DOMAIN=$project_name_default.local.itkdev.dk
+ITKDEV_TEMPLATE=$name
 
 EOF
   fi
