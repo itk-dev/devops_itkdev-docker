@@ -47,14 +47,20 @@ brew install dory
 ### Templates
 
 The [`templates`](templates/) directory contains templates for adding
-the itkdev `docker-compose` setup to new or exiting projects.
+the itkdev `docker compose` setup to new or exiting projects.
+
+Run
 
 ```sh
-rsync -avz templates/<TYPE>/ <PATH TO HTDOCS FOLDER>
+itkdev-docker-compose template:install --list
 ```
 
-Also create an `.env` file beside the `docker-compose.yml` file that contains
-`COMPOSE_PROJECT_NAME=<NAME>` to namespace the docker setup for the projekt.
+to see a list of all templates.
+
+Run `itkdev-docker-compose template:install drupal-10`, say, to install or update a template in a project.
+
+In addition to the docker compose setup for our projects, installing a template will also add GitHib Actions workflow
+files to a project; see [Github Actions templates](docs/github-actions-templates.md) for details.
 
 ### Docker commands
 

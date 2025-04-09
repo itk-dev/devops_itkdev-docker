@@ -24,6 +24,7 @@ for f in $(find config -type f); do
     comment_start='// '
     comment_end=''
   elif [[ "$f" =~ \.xml(\.dist)?$ ]]; then
+    comment_prefix='<?xml version="1.0"?>'
     comment_start='<!-- '
     comment_end=' -->'
   fi
