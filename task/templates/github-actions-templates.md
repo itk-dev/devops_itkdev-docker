@@ -18,6 +18,32 @@ to match the new templates.
 
 ## Templates
 
+The current list of templates is shown in the following sections.
+
 <!--insert:templates:here-->
 
 ---
+
+## Updating template documentation
+
+To update this document, run
+
+``` shell
+task github-actions:documentation:update
+```
+
+### GitHub Actions workflow documentation convention
+
+Each workflow file must contain a single documentation block with lines starting with `###`, e.g.
+
+``` markdown
+### ### The title
+###
+### This template …
+###
+### See … for details.
+```
+
+> [!IMPORTANT]
+> All lines in the documentation block must start with `###` and the documentation block consists of all consecutive
+> lines starting with `###`.
