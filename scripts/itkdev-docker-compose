@@ -98,12 +98,12 @@ function template_install {
       (>&2 echo "${bold}Target $target_dir/.docker already exists (use --force to overwrite)${normal}")
       exit 1
     fi
-  fi
 
-  read -p "Are you sure you want to install the $name template in $target_dir (y|N)? " -n 1 -r
-  echo
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-     exit
+    read -p "Are you sure you want to install the $name template in $target_dir (y|N)? " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      exit
+    fi
   fi
 
   echo "${bold}Installing $name template${normal}"
@@ -119,21 +119,61 @@ function template_install {
     if [ -z "$project_name" ]; then
       project_name=$project_name_default
     fi
-    read -p "Domain (optional)? " -e domain
+    default_domain="$project_name_default.local.itkdev.dk"
+    read -p "Domain [$default_domain]? " -e domain
     cat > $target_dir/.env <<EOF
 COMPOSE_PROJECT_NAME=$project_name
-COMPOSE_DOMAIN=$domain
+COMPOSE_DOMAIN=${domain:-$default_domain}
+ITKDEV_TEMPLATE=$name
 EOF
   else
 cat <<EOF
 
-${bold}Edit .env and make sure that COMPOSE_PROJECT_NAME and, optionally, COMPOSE_DOMAIN is set${normal}, e.g.
+${bold}Edit .env and make sure that COMPOSE_PROJECT_NAME, COMPOSE_DOMAIN, and ITKDEV_TEMPLATE are set${normal}, e.g.
 
 COMPOSE_PROJECT_NAME=$project_name_default
 COMPOSE_DOMAIN=$project_name_default.local.itkdev.dk
+ITKDEV_TEMPLATE=$name
 
 EOF
   fi
+}
+
+function template_update {
+  local force=0
+
+  for var in "$@"
+  do
+    case "$var" in
+      --force)
+        force=1
+        ;;
+    esac
+  done
+
+  local target_dir=$PWD
+  if [ ! -e $target_dir/.env ]; then
+    (>&2 echo "${bold}Cannot read file $target_dir/.env")
+    exit 1
+  fi
+
+  source $target_dir/.env
+
+  if [ -z "${ITKDEV_TEMPLATE:-}" ]; then
+    (>&2 echo "${bold}ITKDEV_TEMPLATE not set in $target_dir/.env")
+    exit 1
+  fi
+  name="$ITKDEV_TEMPLATE"
+
+  if [ "$force" -ne 1 ]; then
+    read -p "Are you sure you want to update the $name template in $target_dir (y|N)? " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      exit
+    fi
+  fi
+
+  template_install --force "$name"
 }
 
 bold=$(tput bold)
@@ -217,6 +257,9 @@ Commands:
   template:install name [--force] [--list]
                 Install a named docker-composer template in the current
                 directory.
+
+  template:update [--force]
+                Update template installed in project.
 
   traefik:start
                 Start træfik reverse proxy.
@@ -399,6 +442,10 @@ EOF
 if [[ "$#" -gt "0" && "$1" == "template:install" ]]; then
   shift
   template_install "$@"
+  exit
+elif [[ "$#" -gt "0" && "$1" == "template:update" ]]; then
+  shift
+  template_update "$@"
   exit
 fi
 
