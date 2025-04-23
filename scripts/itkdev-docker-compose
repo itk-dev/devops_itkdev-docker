@@ -74,7 +74,7 @@ function template_install {
 
   if [ "$list" -eq 1 ]; then
     echo Templates:
-    for name in $templates_dir/*; do
+    for name in $(find "$templates_dir" -mindepth 1 -maxdepth 1 -type d | sort --version-sort); do
       echo "  $(basename $name)"
     done
     exit 0
