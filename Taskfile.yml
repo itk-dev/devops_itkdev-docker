@@ -19,6 +19,14 @@ vars:
   GITHUB_ACTIONS_TEMPLATES_FOOTER: |
 
 tasks:
+  build:
+    desc: "Build everything"
+    cmds:
+      - task: github-actions:documentation:update
+      - task: github-actions:link
+      - task: lint:markdown
+      - task: lint:yaml
+
   lint:markdown:
     desc: "Lint Markdown"
     cmds:
