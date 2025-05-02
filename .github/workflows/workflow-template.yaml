@@ -1,0 +1,15 @@
+on: pull_request
+
+name: Workflow templates
+
+jobs:
+  check-yaml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: |
+          docker pull mikefarah/yq
+          for f in $(find github/workflows/ -name '*.yaml'); do
+            docker run --rm --volume "$PWD":/workdir mikefarah/yq "$f"
+          done
