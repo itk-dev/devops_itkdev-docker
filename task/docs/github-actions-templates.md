@@ -20,5 +20,4 @@ to match the new templates.
 
 [github/workflows/*.yaml](github/workflows/*.yaml)
 
-
 ---

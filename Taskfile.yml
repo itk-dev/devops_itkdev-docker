@@ -39,6 +39,15 @@ tasks:
       GLOB: >-
         {{.CLI_ARGS | default "task/scripts/*"}}
 
+  lint:yaml:
+    desc: "Lint YAML"
+    cmds:
+      - |
+        # docker pull mikefarah/yq
+        for f in $(find github/workflows/ -name '*.yaml'); do
+          docker run --rm --volume "$PWD":/workdir mikefarah/yq "$f" > /dev/null
+        done
+
   default:
     cmds:
       - task --list

@@ -11,5 +11,5 @@ jobs:
       - run: |
           docker pull mikefarah/yq
           for f in $(find github/workflows/ -name '*.yaml'); do
-            docker run --rm --volume "$PWD":/workdir mikefarah/yq "$f"
+            docker run --rm --volume "$PWD":/workdir mikefarah/yq "$f" > /dev/null
           done
