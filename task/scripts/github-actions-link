@@ -11,8 +11,8 @@ cd "$project_dir" || exit
 function strip-project-type() {
   name=$1
 
-  if [[ "$name" =~ ^(drupal|symfony)/(.+) ]]; then
-    name="${BASH_REMATCH[2]}"
+  if [[ "$name" =~ ^(drupal(-module)?|symfony)/(.+) ]]; then
+    name="${BASH_REMATCH[3]}"
   fi
 
   echo "$name"
@@ -27,7 +27,9 @@ for template_dir in templates/*; do
   echo
 
   project_type=""
-  if [[ "$template_name" =~ ^drupal- ]]; then
+  if [[ "$template_name" =~ ^drupal-module ]]; then
+    project_type="drupal-module"
+  elif [[ "$template_name" =~ ^drupal- ]]; then
     project_type="drupal"
   elif [[ "$template_name" =~ ^symfony- ]]; then
     project_type="symfony"
@@ -39,7 +41,11 @@ for template_dir in templates/*; do
   for f in $(find github/workflows/ -name '*.yaml' | sort); do
     source_file_name=''
     # Note: / is NOT a regex delimiter here, but an actual /, i.e. a directory separator.
-    if [[ "$f" =~ /drupal/ ]]; then
+    if [[ "$f" =~ /drupal-module/ ]]; then
+      if [[ "$project_type" == "drupal-module" ]]; then
+        source_file_name="$(basename "$(dirname "$f")")/$(basename "$f")"
+      fi
+    elif [[ "$f" =~ /drupal/ ]]; then
       if [[ "$project_type" == "drupal" ]]; then
         source_file_name="$(basename "$(dirname "$f")")/$(basename "$f")"
       fi
