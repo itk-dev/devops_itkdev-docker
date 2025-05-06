@@ -1,0 +1,7 @@
+services:
+  markdownlint:
+    image: itkdev/markdownlint
+    profiles:
+      - dev
+    volumes:
+      - ./:/md
