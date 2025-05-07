@@ -22,6 +22,7 @@ tasks:
   build:
     desc: "Build everything"
     cmds:
+      - task: github-actions:template-headers:update
       - task: github-actions:documentation:update
       - task: github-actions:link
       - task: lint:markdown
