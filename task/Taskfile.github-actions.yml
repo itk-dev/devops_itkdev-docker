@@ -89,7 +89,7 @@ tasks:
         echo "  name: 'ITK-dev docker setup'"
         ) >> {{.DATA_PATH}}
         echo "files:" >> {{.DATA_PATH}}
-        for f in $(find {{.WORKFLOW_FOLDER}} -name '*.yaml'); do
+        for f in $(find {{.WORKFLOW_FOLDER}} -name '*.yaml' | sort); do
           echo "  - $(basename "$f")" >> {{.DATA_PATH}}
         done
 

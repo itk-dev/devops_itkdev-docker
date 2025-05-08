@@ -2,13 +2,13 @@
 
 The 7 workflow files
 
-* [twig.yaml](twig.yaml)
-* [markdown.yaml](markdown.yaml)
-* [javascript.yaml](javascript.yaml)
-* [styles.yaml](styles.yaml)
-* [php.yaml](php.yaml)
-* [composer.yaml](composer.yaml)
 * [changelog.yaml](changelog.yaml)
+* [composer.yaml](composer.yaml)
+* [javascript.yaml](javascript.yaml)
+* [markdown.yaml](markdown.yaml)
+* [php.yaml](php.yaml)
+* [styles.yaml](styles.yaml)
+* [twig.yaml](twig.yaml)
 
 in this folder are generated from <https://github.com/itk-dev/devops_itkdev-docker>.
 
