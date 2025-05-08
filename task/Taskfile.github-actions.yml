@@ -58,8 +58,8 @@ tasks:
         vars:
           SCRIPT: github-actions-link
       - |
-          for f in $(find templates -mindepth 1 -maxdepth 1 -type d); do
-            WORKFLOW_FOLDER="$f" task github-actions:workflow-documentation:update
+          for f in $(find templates -mindepth 1 -maxdepth 1 -type d | sort); do
+            WORKFLOW_FOLDER="$f/.github/workflows" task github-actions:workflow-documentation:update
           done
     silent: true
 
