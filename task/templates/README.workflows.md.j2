@@ -1,0 +1,19 @@
+# Workflow templates
+
+The {{files|length}} workflow files
+
+{% for file in files -%}
+* [{{ file }}]({{file}})
+{% endfor %}
+
+in this folder are generated from <{{repository.url}}>.
+
+See [Github Actions templates]({{repository.url}}/blob/develop/docs/github-actions-templates.md)
+for general information on the workflow templates.
+
+[Create a pull request]({{repository.url}}/pulls) to fix any bugs you find
+or to add new or missing features.
+
+{# Local Variables: #}
+{# mode: markdown #}
+{# End: #}

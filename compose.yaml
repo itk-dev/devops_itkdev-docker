@@ -5,3 +5,12 @@ services:
       - dev
     volumes:
       - ./:/md
+
+  jinja2-cli:
+    # https://hub.docker.com/r/roquie/docker-jinja2-cli
+    # Is https://hub.docker.com/r/stagex/user-py-jinja2 a better choice?
+    image: roquie/docker-jinja2-cli
+    profiles:
+      - dev
+    volumes:
+      - ./:/app

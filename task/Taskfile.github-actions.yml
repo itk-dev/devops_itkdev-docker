@@ -57,6 +57,10 @@ tasks:
       - task: run-script
         vars:
           SCRIPT: github-actions-link
+      - |
+          for f in $(find templates -mindepth 1 -maxdepth 1 -type d); do
+            WORKFLOW_FOLDER="$f" task github-actions:workflow-documentation:update
+          done
     silent: true
 
   show:
@@ -72,3 +76,30 @@ tasks:
     requires:
       vars:
         - SCRIPT
+
+  workflow-documentation:update:
+    cmds:
+      - defer: rm {{.DATA_PATH}}
+      - |
+        : > {{.DATA_PATH}}
+        (
+        echo "repository:"
+        # TODO Get this URL from `git`
+        echo "  url: 'https://github.com/itk-dev/devops_itkdev-docker'"
+        echo "  name: 'ITK-dev docker setup'"
+        ) >> {{.DATA_PATH}}
+        echo "files:" >> {{.DATA_PATH}}
+        for f in $(find {{.WORKFLOW_FOLDER}} -name '*.yaml'); do
+          echo "  - $(basename "$f")" >> {{.DATA_PATH}}
+        done
+
+      - cat {{.DATA_PATH}}
+
+      - docker compose run --rm jinja2-cli --strict --format=yaml {{.TEMPLATE_PATH}} {{.DATA_PATH}} | tee {{.WORKFLOW_FOLDER}}/README.workflows.md
+      - task lint:markdown
+    vars:
+      TEMPLATE_PATH: task/templates/README.workflows.md.j2
+      DATA_PATH: tmp-data.yaml
+    requires:
+      vars:
+        - WORKFLOW_FOLDER
