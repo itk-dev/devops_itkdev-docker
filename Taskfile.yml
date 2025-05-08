@@ -31,12 +31,18 @@ tasks:
   lint:markdown:
     desc: "Lint Markdown"
     cmds:
-      - '[[ -n "$SKIP_FIX" ]] || docker run --rm --volume "$PWD":/md itkdev/markdownlint markdownlint {{.GLOB}} --fix'
-      - docker run --rm --volume "$PWD":/md itkdev/markdownlint markdownlint {{.GLOB}}
+      - '[[ -n "$SKIP_FIX" ]] || {{.MARKDOWNLINT_COMMAND}} --fix'
+      - '{{.MARKDOWNLINT_COMMAND}}'
     vars:
       # We use a block scalar (https://yaml-multiline.info/#block-scalars) here to make escaping (a little) easier.
       GLOB: >-
         {{.CLI_ARGS | default "'**/*.md'"}}
+      # I don't (yet) know why, but `itkdev/markdownlint` has an issue with
+      # permissions when running in GitHub Actions. Therefore we use
+      # `peterdavehello/markdownlint`
+      # (https://hub.docker.com/r/peterdavehello/markdownlint)
+      MARKDOWNLINT_COMMAND: >-
+        docker run --rm --volume "$PWD":/md peterdavehello/markdownlint markdownlint --dot {{.GLOB}}
 
   lint:shell-script:
     desc: "Lint shell scripts"
