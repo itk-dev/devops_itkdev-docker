@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 tasks:
   documentation:update:
@@ -19,7 +19,7 @@ tasks:
       - git diff --exit-code --ignore-blank-lines --ignore-matching-lines='automatically created' '*.md'
 
   documentation:checkout:
-    desc: 'git checkout all translation file changes if only date metadata is changed'
+    desc: "git checkout all translation file changes if only date metadata is changed"
     cmds:
       - git checkout '*.md'
     # https://taskfile.dev/reference/schema#precondition
