@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+set -o errexit -o errtrace -o noclobber -o nounset -o pipefail
+IFS=$'\n\t'
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+project_dir=$(cd "$(dirname "$script_dir")/.." && pwd)
+
+cd "$project_dir" || exit
+
+# String type (drupal or symfony) from start of name
+function strip-project-type() {
+  name=$1
+
+  if [[ "$name" =~ ^(drupal(-module)?|symfony)/(.+) ]]; then
+    name="${BASH_REMATCH[3]}"
+  fi
+
+  echo "$name"
+}
+
+find templates -type l -delete
+
+for template_dir in templates/*; do
+  template_name=$(basename "$template_dir")
+
+  echo "$template_name"
+  echo
+
+  project_type=""
+  if [[ "$template_name" =~ ^drupal-module ]]; then
+    project_type="drupal-module"
+  elif [[ "$template_name" =~ ^drupal- ]]; then
+    project_type="drupal"
+  elif [[ "$template_name" =~ ^symfony- ]]; then
+    project_type="symfony"
+  else
+    (>&2 echo "Unknown template type: $template_name")
+    exit 1
+  fi
+
+  for f in $(find github/workflows/ -name '*.yaml' | sort); do
+    source_file_name=''
+    # Note: / is NOT a regex delimiter here, but an actual /, i.e. a directory separator.
+    if [[ "$f" =~ /drupal-module/ ]]; then
+      if [[ "$project_type" == "drupal-module" ]]; then
+        source_file_name="$(basename "$(dirname "$f")")/$(basename "$f")"
+      fi
+    elif [[ "$f" =~ /drupal/ ]]; then
+      if [[ "$project_type" == "drupal" ]]; then
+        source_file_name="$(basename "$(dirname "$f")")/$(basename "$f")"
+      fi
+    elif [[ "$f" =~ /symfony/ ]]; then
+      if [[ "$project_type" == "symfony" ]]; then
+        source_file_name="$(basename "$(dirname "$f")")/$(basename "$f")"
+      fi
+    else
+      source_file_name=$(basename "$f")
+    fi
+
+    if [[ -n "$source_file_name" ]]; then
+      # Link GitHub Actions workflow file
+      target_dir="$template_dir/.github/workflows"
+      mkdir -p "$target_dir"
+      ln -sf "../../../../github/workflows/$source_file_name" "$target_dir/$(strip-project-type "$source_file_name")"
+
+      # Check if we need a language configuration as well
+      language_name=${source_file_name%.yaml}
+      config_dir=""
+      # Check for project_type specific configuration first.
+      if [ -d "config/$project_type/$language_name" ]; then
+        config_dir="config/$project_type/$language_name"
+      elif [ -d "config/$language_name" ]; then
+        config_dir="config/$language_name"
+      fi
+
+      if [[ -n "$config_dir" ]]; then
+        # Some config files are hidden
+        GLOBIGNORE=".:.."
+        for config_file in "$config_dir"/*; do
+          if [ -f "$config_file" ]; then
+            ln -sf "../../$config_file" "$template_dir/"
+          fi
+        done
+      fi
+    fi
+  done
+
+  find "$template_dir" -type l -ls
+  echo
+done

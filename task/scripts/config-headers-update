@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+project_dir=$(cd "$(dirname "$script_dir")/.." && pwd)
+
+cd "$project_dir" || exit
+
+# shellcheck disable=SC2044
+for f in $(find config -type f); do
+  echo "$f"
+
+  # Remove exiting header.
+  # This is done by deleting all lines from the top of the file to a blank line.
+  sed -i '1,/^$/d' "$f"
+
+  comment_prefix=''
+  comment_start='# '
+  comment_end=''
+  if [[ "$f" =~ \.php(\.dist)?$ ]]; then
+    comment_prefix='<?php'
+    comment_start='// '
+    comment_end=''
+  elif [[ "$f" =~ \.jsonc$ ]]; then
+    comment_start='// '
+    comment_end=''
+  elif [[ "$f" =~ \.xml(\.dist)?$ ]]; then
+    comment_prefix='<?xml version="1.0"?>'
+    comment_start='<!-- '
+    comment_end=' -->'
+  fi
+  # Write header and file into temporary file.
+  (
+    [[ -n "${comment_prefix}" ]] && echo "${comment_prefix}"
+    echo "${comment_start}This file is copied from $f in https://github.com/itk-dev/devops_itkdev-docker.${comment_end}"
+    echo "${comment_start}Feel free to edit the file, but consider making a pull request if you find a general issue with the file.${comment_end}"
+    echo ""
+    cat "$f"
+  ) > "$f.tmp"
+  # Replace original file with temporary file.
+  mv "$f.tmp" "$f"
+done

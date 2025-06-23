@@ -1,0 +1,64 @@
+# https://taskfile.dev
+
+version: "3"
+
+includes:
+  github-actions: ./task/Taskfile.github-actions.yml
+
+vars:
+  GITHUB_ACTIONS_TEMPLATES_HEADER: |
+    # Github Actions templates
+
+    This repository contains a number of [GitHub
+    Actions](https://docs.github.com/en/actions) workflow template files that
+    are copied to a project when running `itkdev-docker-compose
+    template:install`. Any changes to the workflows should be made in [this
+    repository](%THIS_REPOSITORY%) and then the project template must be updated
+    to match the new templates.
+
+  GITHUB_ACTIONS_TEMPLATES_FOOTER: |
+
+tasks:
+  build:
+    desc: "Build everything"
+    cmds:
+      - task: github-actions:config-headers:update
+      - task: github-actions:template-headers:update
+      - task: github-actions:documentation:update
+      - task: github-actions:link
+      - task: lint:markdown
+      - task: lint:yaml
+
+  lint:markdown:
+    desc: "Lint Markdown"
+    cmds:
+      - '[[ -n "$SKIP_FIX" ]] || docker run --rm --volume "$PWD":/md itkdev/markdownlint markdownlint {{.GLOB}} --fix'
+      - docker run --rm --volume "$PWD":/md itkdev/markdownlint markdownlint {{.GLOB}}
+    vars:
+      # We use a block scalar (https://yaml-multiline.info/#block-scalars) here to make escaping (a little) easier.
+      GLOB: >-
+        {{.CLI_ARGS | default "'**/*.md'"}}
+
+  lint:shell-script:
+    desc: "Lint shell scripts"
+    cmds:
+      # https://github.com/koalaman/shellcheck?tab=readme-ov-file#installing
+      - docker run --rm --volume "$PWD:"/mnt koalaman/shellcheck:stable {{.GLOB}}
+    vars:
+      # We use a block scalar (https://yaml-multiline.info/#block-scalars) here to make escaping (a little) easier.
+      GLOB: >-
+        {{.CLI_ARGS | default "task/scripts/*"}}
+
+  lint:yaml:
+    desc: "Lint YAML"
+    cmds:
+      - |
+        # docker pull mikefarah/yq
+        for f in $(find github/workflows/ -name '*.yaml'); do
+          docker run --rm --volume "$PWD":/workdir mikefarah/yq "$f" > /dev/null
+        done
+
+  default:
+    cmds:
+      - task --list
+    silent: true
