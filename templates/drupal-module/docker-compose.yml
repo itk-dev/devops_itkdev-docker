@@ -7,6 +7,13 @@ services:
     volumes:
       - .:/app
 
+  markdownlint:
+    image: itkdev/markdownlint
+    profiles:
+      - dev
+    volumes:
+      - ./:/md
+
   prettier:
     # Prettier does not (yet, fcf.
     # https://github.com/prettier/prettier/issues/15206) have an official
