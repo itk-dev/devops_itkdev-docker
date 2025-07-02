@@ -35,9 +35,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - run: |
+          docker network create frontend
+
       - name: Start docker and install dependencies
         run: |
-          docker network create frontend
           docker compose pull
           docker compose up --detach
 
@@ -71,9 +73,11 @@ jobs:
         with:
           ref: ${{ github.base_ref }}
 
+      - run: |
+          docker network create frontend
+
       - name: Start docker and install dependencies
         run: |
-          docker network create frontend
           docker compose pull
           docker compose up --detach
 
@@ -111,7 +115,6 @@ jobs:
 
       - name: Start docker and install dependencies
         run: |
-          docker network create frontend || true
           docker compose pull
           docker compose up --detach
 
