@@ -26,7 +26,13 @@ jobs:
           docker network create frontend
           docker compose run --rm --user=root phpfpm composer install --no-dev --classmap-authoritative
           docker compose run --rm --user=root phpfpm composer clear-cache
-
+      - name: Build additional assets
+        # Build any additional assets here
+        run: |
+          # docker compose run --rm node npm --prefix /app/web/themes/custom/site-theme install
+          # docker compose run --rm node npm --prefix /app/web/themes/custom/site-theme run build
+          # docker compose run --rm node rm -fr /app/web/themes/custom/site-theme/node_modules
+          
       - name: Make assets dir
         run: |
           mkdir -p ../assets
