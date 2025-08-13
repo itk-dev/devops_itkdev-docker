@@ -14,9 +14,6 @@ env:
 jobs:
   create-release:
     runs-on: ubuntu-latest
-    env:
-      COMPOSER_ALLOW_SUPERUSER: 1
-      APP_ENV: prod
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,8 +21,8 @@ jobs:
       - name: Composer install
         run: |
           docker network create frontend
-          docker compose run --rm --user=root phpfpm composer install --no-dev --classmap-authoritative
-          docker compose run --rm --user=root phpfpm composer clear-cache
+          docker compose run --rm phpfpm composer install --no-dev --classmap-authoritative
+          docker compose run --rm phpfpm composer clear-cache
       - name: Build additional assets
         # Build any additional assets here
         run: |
