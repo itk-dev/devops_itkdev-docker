@@ -17,7 +17,7 @@ jobs:
           - symfony-6
     name: Validate compose (${{ matrix.version }})
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v5
 
       - name: Validate local docker compose files
         run: |
