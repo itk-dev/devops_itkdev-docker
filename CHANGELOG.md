@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- [PR-121](https://github.com/itk-dev/devops_itkdev-docker/pull/121))
+  - Changed COMPOSE_USER to runner.
 - [PR-108](https://github.com/itk-dev/devops_itkdev-docker/pull/108)
-  Added Drupal module template
+  - Added Drupal module template
 
 ### Changed
 
