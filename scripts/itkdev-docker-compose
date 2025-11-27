@@ -187,12 +187,6 @@ Usage: itkdev-docker-compose command [command arguments]
 
 Commands:
 
-  dory:start
-                Start dory reverse proxy
-
-  dory:stop
-                Stop dory reverse proxy
-
   url [service [port]]
                 Print url to site or a service
 
@@ -465,10 +459,6 @@ fi
 
 # Allow traefik:start without existence of .env
 if [[ "$#" -gt "0" && "$1" == "traefik:start" ]]; then
-  if [ "$(docker inspect -f '{{.State.Running}}' dory_dnsmasq 2>/dev/null)" == "true" ]; then
-    (>&2 echo "${bold}Dory reverse proxy should be stopped first. Run itkdev-docker-compose dory:stop.${normal}")
-    exit 22;
-  fi
   docker network inspect frontend >/dev/null 2>&1 || docker network create --driver=bridge --attachable --internal=false frontend
   $(cd ${script_dir}/../traefik/; docker compose up -d)
   exit
@@ -483,22 +473,6 @@ fi
 # Allow traefik:pull without existence of .env
 if [[ "$#" -gt "0" && "$1" == "traefik:pull" ]]; then
   $(cd ${script_dir}/../traefik/; docker compose pull)
-  exit
-fi
-
-# Allow dory:start without existence of .env
-if [[ "$#" -gt "0" && "$1" == "dory:start" ]]; then
-  if [ "$(docker inspect -f '{{.State.Running}}' traefik 2>/dev/null)" == "true" ]; then
-    (>&2 echo "${bold}Traefik reverse proxy should be stopped first. Run itkdev-docker-compose traefik:stop.${normal}")
-    exit 22;
-  fi
-  dory up
-  exit
-fi
-
-# Allow dory:start without existence of .env
-if [[ "$#" -gt "0" && "$1" == "dory:stop" ]]; then
-  dory down
   exit
 fi
 
@@ -560,10 +534,9 @@ fi
 # Check if revers proxy is running and print warning if not.
 set +o errexit
 is_treafik_running=$(docker inspect -f '{{.State.Running}}' traefik 2>/dev/null)
-is_dory_running=$(docker inspect -f '{{.State.Running}}' dory_dnsmasq 2>/dev/null)
 set -o errexit
 
-if [ ! "$is_treafik_running" == "true" ] && [ ! "$is_dory_running" == "true" ]; then
+if [ ! "$is_treafik_running" == "true" ]; then
   (>&2 echo "${bold}Reverse proxy has not been started. Hostname will not be resolved to containers and not all commands will work correctly.${normal}")
 fi
 
