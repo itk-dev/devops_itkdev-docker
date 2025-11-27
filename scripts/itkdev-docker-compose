@@ -41,7 +41,7 @@ function self_update {
   git checkout "$branch"
   git pull
 
-  echo "${bold}Done.${normal}"
+  echo "${bold}Done. Please run traefik:pull to ensure you have the latest containers.${normal}"
 
   echo
   echo "Latest changes:"
@@ -264,16 +264,22 @@ Commands:
                 Update template installed in project.
 
   traefik:start
-                Start træfik reverse proxy.
+                Start traefik reverse proxy.
 
   traefik:stop
-                Stop træfik reverse proxy
+                Stop traefik reverse proxy
 
   traefik:url
-                URL for the administrative UI for træfik.
+                URL for the administrative UI for traefik.
 
   traefik:open
-                Open the administrative UI for træfik.
+                Open the administrative UI for traefik.
+
+  traefik:logs
+                See traefik logs
+
+  traefik:pull
+                Pull latest traefik & socket-proxy containers
 
   mail:url
                 URL for the test mail web interface.
@@ -471,6 +477,12 @@ fi
 # Allow traefik:stop without existence of .env
 if [[ "$#" -gt "0" && "$1" == "traefik:stop" ]]; then
   $(cd ${script_dir}/../traefik/; docker compose down --volumes)
+  exit
+fi
+
+# Allow traefik:pull without existence of .env
+if [[ "$#" -gt "0" && "$1" == "traefik:pull" ]]; then
+  $(cd ${script_dir}/../traefik/; docker compose pull)
   exit
 fi
 
@@ -726,6 +738,11 @@ EOF
     label=$(docker inspect --format '{{ index .Config.Labels "traefik.http.routers.traefik.rule"}}' traefik)
     url=$(echo "${label}" | sed -n 's/[^(]*(.\(.*\).)/\1/p')
     echo http://${url}:8080;
+    ;;
+
+  traefik:logs)
+    echo "docker logs --tail 20 traefik"
+    docker logs --tail 20 traefik
     ;;
 
   mail:url)
