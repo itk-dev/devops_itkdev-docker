@@ -1,6 +1,8 @@
 # ITK Dev Taskfile Patterns
 
-This document describes the Taskfile patterns used in ITK Dev projects. Tasks are managed using [Task](https://taskfile.dev/) (go-task), a task runner similar to Make but with YAML configuration.
+This document describes the Taskfile patterns used in ITK Dev projects.
+Tasks are managed using [Task](https://taskfile.dev/) (go-task),
+a task runner similar to Make but with YAML configuration.
 
 ## Overview
 

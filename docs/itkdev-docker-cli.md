@@ -342,7 +342,7 @@ itkdev-docker-compose php -v
 itkdev-docker-compose php script.php
 ```
 
-#### bin/* and vendor/bin/*
+#### bin/*and vendor/bin/*
 
 Run any binary from the project:
 
@@ -501,7 +501,7 @@ Minimal template for module development:
 
 When you run `template:install`, these files are created:
 
-```
+```text
 project/
 ├── .env                           # Created interactively (if not exists)
 ├── docker-compose.yml             # Base service configuration
@@ -531,7 +531,7 @@ project/
 
 ### Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                     Host Machine                            │
 │  ┌─────────────────────────────────────────────────────────┐│

@@ -7,7 +7,9 @@
 
 ## Summary
 
-This RFC proposes adding a Model Context Protocol (MCP) server to the itkdev-docker repository. The MCP server will provide AI coding assistants (like Claude Code) with structured access to ITK Dev documentation, project detection capabilities, and template management tools.
+This RFC proposes adding a Model Context Protocol (MCP) server to the itkdev-docker repository.
+The MCP server will provide AI coding assistants (like Claude Code) with structured access to
+ITK Dev documentation, project detection capabilities, and template management tools.
 
 ## Motivation
 
@@ -22,6 +24,7 @@ When developers use AI coding assistants on ITK Dev projects, the assistants lac
 5. How to detect and compare project configurations against templates
 
 This leads to:
+
 - Inconsistent AI-generated configurations
 - Manual explanation of ITK Dev patterns in every session
 - Inability to leverage AI for project setup/maintenance tasks
@@ -37,7 +40,8 @@ Create an MCP server that provides:
 
 ### What is MCP?
 
-Model Context Protocol (MCP) is an open protocol developed by Anthropic that enables AI applications to connect with external data sources and tools. It provides a standardized way to:
+Model Context Protocol (MCP) is an open protocol developed by Anthropic that enables AI
+applications to connect with external data sources and tools. It provides a standardized way to:
 
 - Expose resources (documents, data) to AI models
 - Provide tools that AI can invoke
@@ -62,7 +66,8 @@ We chose the **local stdio** approach because:
 4. **Integration**: Natural fit with existing itkdev-docker repository
 5. **Offline support**: Works without network access
 
-The MCP server will be added to the existing itkdev-docker repository, allowing developers to configure it once after cloning/updating the repo.
+The MCP server will be added to the existing itkdev-docker repository, allowing developers to
+configure it once after cloning/updating the repo.
 
 ## Documentation Created
 
@@ -109,7 +114,7 @@ Documents Taskfile automation:
 
 ### Repository Structure
 
-```
+```text
 itkdev-docker/
 ├── mcp/                          # NEW: MCP server
 │   ├── package.json
@@ -159,6 +164,7 @@ See [mcp/README.md](../mcp/README.md) for build and configuration instructions.
 Developer: "Set up a new Drupal 11 project called 'citizen-portal'"
 
 AI assistant can:
+
 1. Read `itkdev://docs/cli` for setup instructions
 2. Use `itkdev_list_templates` to confirm template exists
 3. Provide exact commands based on documentation
@@ -168,6 +174,7 @@ AI assistant can:
 Developer: "Is this project using the latest template version?"
 
 AI assistant can:
+
 1. Use `itkdev_detect_project` to analyze current configuration
 2. Use `itkdev_compare_project` to find differences
 3. Suggest specific updates needed
@@ -177,6 +184,7 @@ AI assistant can:
 Developer: "Docker containers won't start"
 
 AI assistant can:
+
 1. Read documentation for troubleshooting steps
 2. Use `itkdev_detect_project` to understand configuration
 3. Provide targeted solutions
@@ -186,6 +194,7 @@ AI assistant can:
 Developer: "Upgrade this project from drupal-10 to drupal-11"
 
 AI assistant can:
+
 1. Use `itkdev_compare_project` with both templates
 2. Identify specific changes needed
 3. Guide through migration steps
@@ -217,6 +226,7 @@ AI assistant can:
 Add CLAUDE.md to each project template pointing to documentation.
 
 **Rejected because:**
+
 - No tool capabilities
 - Requires path assumptions
 - Less discoverable
@@ -226,6 +236,7 @@ Add CLAUDE.md to each project template pointing to documentation.
 Run MCP server as shared team service.
 
 **Rejected because:**
+
 - Infrastructure overhead
 - Single point of failure
 - Overkill for current needs
@@ -235,6 +246,7 @@ Run MCP server as shared team service.
 Create standalone mcp-itkdev repository.
 
 **Rejected because:**
+
 - Fragmented maintenance
 - Documentation sync issues
 - Additional repo to manage

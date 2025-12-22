@@ -160,15 +160,17 @@ The fuld list can be found at
 
 ## MCP Server for AI Assistants
 
-This repository includes an MCP (Model Context Protocol) server that provides AI coding assistants like Claude Code with access to ITK Dev documentation and project analysis tools.
+This repository includes an MCP (Model Context Protocol) server that provides AI coding
+assistants like Claude Code with access to ITK Dev documentation and project analysis tools.
 
 ### What it provides
 
-- **Documentation access**: AI assistants can read ITK Dev Docker documentation
-- **Project detection**: Analyze projects to detect template, PHP version, framework
-- **Template comparison**: Compare projects against templates to find outdated files
+- __Documentation access__: AI assistants can read ITK Dev Docker documentation
+- __Project detection__: Analyze projects to detect template, PHP version, framework
+- __Template comparison__: Compare projects against templates to find outdated files
 
-See [mcp/README.md](mcp/README.md) for installation and configuration instructions, and [docs/rfc-mcp-server.md](docs/rfc-mcp-server.md) for the design rationale.
+See [mcp/README.md](mcp/README.md) for installation and configuration instructions,
+and [docs/rfc-mcp-server.md](docs/rfc-mcp-server.md) for the design rationale.
 
 ## Documentation
 

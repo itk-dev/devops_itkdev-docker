@@ -1,10 +1,12 @@
 # ITK Dev Docker MCP Server
 
-Model Context Protocol (MCP) server that provides AI coding assistants with access to ITK Dev Docker documentation and project analysis tools.
+Model Context Protocol (MCP) server that provides AI coding assistants with access to
+ITK Dev Docker documentation and project analysis tools.
 
 ## What is MCP?
 
-MCP (Model Context Protocol) is an open protocol that enables AI assistants like Claude to access external resources and tools. This server provides:
+MCP (Model Context Protocol) is an open protocol that enables AI assistants like Claude to
+access external resources and tools. This server provides:
 
 - **Documentation Resources**: Access to ITK Dev Docker documentation
 - **Project Tools**: Analyze, detect, and compare ITK Dev projects
@@ -96,12 +98,14 @@ List all available ITK Dev Docker templates with their characteristics.
 Analyze a directory to detect ITK Dev project configuration.
 
 **Parameters:**
+
 - `path` (required): Absolute path to the project directory
 
 **Example prompt:**
 > "Analyze the project at /Users/me/projects/mysite"
 
 **Returns:**
+
 - Project type (Drupal/Symfony)
 - Template in use
 - PHP version
@@ -114,6 +118,7 @@ Analyze a directory to detect ITK Dev project configuration.
 List all files that would be installed by a template.
 
 **Parameters:**
+
 - `template` (required): Template name (e.g., `drupal-11`)
 
 **Example prompt:**
@@ -124,6 +129,7 @@ List all files that would be installed by a template.
 Compare a project against its template to find differences.
 
 **Parameters:**
+
 - `path` (required): Absolute path to the project
 - `template` (optional): Template to compare against (auto-detected from .env)
 
@@ -131,6 +137,7 @@ Compare a project against its template to find differences.
 > "Is my project at /Users/me/projects/mysite up to date with its template?"
 
 **Returns:**
+
 - Missing files
 - Outdated files (with version comparison)
 - Matching files
@@ -141,6 +148,7 @@ Compare a project against its template to find differences.
 Get the content of a specific file from a template.
 
 **Parameters:**
+
 - `template` (required): Template name
 - `file` (required): Relative file path
 
@@ -185,7 +193,7 @@ Rebuilds on file changes.
 
 ### Project Structure
 
-```
+```text
 mcp/
 ├── src/
 │   └── index.ts      # MCP server implementation
@@ -213,6 +221,7 @@ mcp/
 ### Documentation Not Found
 
 Ensure these files exist in `itkdev-docker/docs/`:
+
 - `docs/itkdev-docker-cli.md`
 - `docs/itkdev-docker-compose.md`
 - `docs/itkdev-task-files.md`

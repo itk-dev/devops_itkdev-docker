@@ -1,6 +1,7 @@
 # ITK Dev Docker Compose Setup
 
-This document describes the Docker Compose patterns used in ITK Dev projects. It covers both local development and server deployment configurations.
+This document describes the Docker Compose patterns used in ITK Dev projects.
+It covers both local development and server deployment configurations.
 
 ## Overview
 
@@ -321,7 +322,8 @@ services:
 
 Certificate setup for OIDC mock requires a `.docker/oidc-server-mock/cert/docker.pfx` file.
 
-For server OIDC (`docker-compose.server.oidc.yml`), use `COMPOSE_SERVER_DOMAIN` instead of `COMPOSE_DOMAIN` in the container name and labels.
+For server OIDC (`docker-compose.server.oidc.yml`), use `COMPOSE_SERVER_DOMAIN` instead of
+`COMPOSE_DOMAIN` in the container name and labels.
 
 ## Server Configuration (docker-compose.server.yml)
 
@@ -430,6 +432,7 @@ services:
 ```
 
 Key features:
+
 - Basic Auth middleware (`ITKBasicAuth@file`) for protected staging environments
 - Mailpit with authentication middleware for mail capture on server
 
@@ -473,6 +476,7 @@ services:
 ```
 
 Key settings:
+
 - `PHP_OPCACHE_VALIDATE_TIMESTAMPS=0` - Disables OPcache timestamp validation for performance
 - Customized upload size limits for the specific environment
 
@@ -494,6 +498,7 @@ services:
 ```
 
 This pattern allows:
+
 - Persistent settings across deployments
 - Shared file storage between releases
 - Private files directory for sensitive uploads
@@ -653,7 +658,7 @@ Internal bridge network for service communication. Created automatically.
 
 ## Directory Structure
 
-```
+```text
 .docker/
 ├── templates/
 │   └── default.conf.template    # Nginx vhost template
