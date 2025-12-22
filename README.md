@@ -158,6 +158,50 @@ At ITK-dev we have created docker images that matches our development.
 The fuld list can be found at
 [https://hub.docker.com/search?q=itkdev&type=image](https://hub.docker.com/search?q=itkdev&type=image).
 
+## MCP Server for AI Assistants
+
+This repository includes an MCP (Model Context Protocol) server that provides AI coding assistants like Claude Code with access to ITK Dev documentation and project analysis tools.
+
+### What it provides
+
+- **Documentation access**: AI assistants can read ITK Dev Docker documentation
+- **Project detection**: Analyze projects to detect template, PHP version, framework
+- **Template comparison**: Compare projects against templates to find outdated files
+
+### Installation
+
+```bash
+# Build the MCP server
+cd mcp
+npm install
+npm run build
+```
+
+Add to `~/.claude/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "itkdev": {
+      "command": "node",
+      "args": ["/path/to/itkdev-docker/mcp/dist/index.js"]
+    }
+  }
+}
+```
+
+See [mcp/README.md](mcp/README.md) for detailed documentation and [docs/rfc-mcp-server.md](docs/rfc-mcp-server.md) for the design rationale.
+
+## Documentation
+
+Comprehensive documentation is available in the [docs/](docs/) directory:
+
+- [itkdev-docker-cli.md](docs/itkdev-docker-cli.md) - CLI tool commands and setup procedures
+- [itkdev-docker-compose.md](docs/itkdev-docker-compose.md) - Docker Compose patterns
+- [itkdev-task-files.md](docs/itkdev-task-files.md) - Taskfile automation patterns
+- [github-actions-templates.md](docs/github-actions-templates.md) - GitHub Actions workflows
+- [rfc-mcp-server.md](docs/rfc-mcp-server.md) - MCP server design rationale
+
 ## More
 
 For more details about usage see <https://docs.itkdev.dk>
