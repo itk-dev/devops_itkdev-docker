@@ -150,53 +150,7 @@ itkdev-docker/
 
 ### User Configuration
 
-First, build the MCP server:
-
-```bash
-cd /path/to/itkdev-docker/mcp
-npm install
-npm run build
-```
-
-Then configure Claude Code using one of these methods:
-
-#### Option 1: User-wide configuration (all projects)
-
-Create or edit `~/.claude.json`:
-
-```json
-{
-  "mcpServers": {
-    "itkdev": {
-      "command": "node",
-      "args": ["/path/to/itkdev-docker/mcp/dist/index.js"]
-    }
-  }
-}
-```
-
-#### Option 2: Project-specific configuration
-
-Create `.mcp.json` in your project root:
-
-```json
-{
-  "mcpServers": {
-    "itkdev": {
-      "command": "node",
-      "args": ["/path/to/itkdev-docker/mcp/dist/index.js"]
-    }
-  }
-}
-```
-
-#### Option 3: CLI command
-
-```bash
-claude mcp add itkdev --scope user -- node /path/to/itkdev-docker/mcp/dist/index.js
-```
-
-After configuration, restart Claude Code and run `/mcp` to verify the server is connected.
+See [mcp/README.md](../mcp/README.md) for build and configuration instructions.
 
 ## Use Cases
 

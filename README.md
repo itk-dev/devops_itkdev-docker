@@ -168,29 +168,7 @@ This repository includes an MCP (Model Context Protocol) server that provides AI
 - **Project detection**: Analyze projects to detect template, PHP version, framework
 - **Template comparison**: Compare projects against templates to find outdated files
 
-### Installation
-
-```bash
-# Build the MCP server
-cd mcp
-npm install
-npm run build
-```
-
-Add to `~/.claude/settings.json`:
-
-```json
-{
-  "mcpServers": {
-    "itkdev": {
-      "command": "node",
-      "args": ["/path/to/itkdev-docker/mcp/dist/index.js"]
-    }
-  }
-}
-```
-
-See [mcp/README.md](mcp/README.md) for detailed documentation and [docs/rfc-mcp-server.md](docs/rfc-mcp-server.md) for the design rationale.
+See [mcp/README.md](mcp/README.md) for installation and configuration instructions, and [docs/rfc-mcp-server.md](docs/rfc-mcp-server.md) for the design rationale.
 
 ## Documentation
 

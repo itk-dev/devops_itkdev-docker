@@ -26,32 +26,44 @@ npm run build
 
 ### Configure Claude Code
 
-Add to `~/.claude/settings.json`:
+Configure Claude Code using one of these methods:
+
+#### Option 1: User-wide configuration (all projects)
+
+Create or edit `~/.claude.json`:
 
 ```json
 {
   "mcpServers": {
     "itkdev": {
       "command": "node",
-      "args": ["/absolute/path/to/itkdev-docker/mcp/dist/index.js"]
+      "args": ["/path/to/itkdev-docker/mcp/dist/index.js"]
     }
   }
 }
 ```
 
-Replace `/absolute/path/to/itkdev-docker` with the actual path to your itkdev-docker clone.
+Replace `/path/to/itkdev-docker` with the actual path to your itkdev-docker clone.
 
-**Example:**
+#### Option 2: Project-specific configuration
+
+Create `.mcp.json` in your project root:
 
 ```json
 {
   "mcpServers": {
     "itkdev": {
       "command": "node",
-      "args": ["/Users/developer/itkdev-docker/mcp/dist/index.js"]
+      "args": ["/path/to/itkdev-docker/mcp/dist/index.js"]
     }
   }
 }
+```
+
+#### Option 3: CLI command
+
+```bash
+claude mcp add itkdev --scope user -- node /path/to/itkdev-docker/mcp/dist/index.js
 ```
 
 ### Verify Installation
