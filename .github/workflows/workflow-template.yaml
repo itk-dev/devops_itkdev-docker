@@ -3,16 +3,18 @@ on: pull_request
 name: Workflow templates
 
 jobs:
-  check-yaml:
+  # https://github.com/rhysd/actionlint/blob/v1.7.10/docs/usage.md#use-actionlint-on-github-actions
+  actionlint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-
-      - run: |
-          docker pull mikefarah/yq
-          for f in $(find github/workflows/ -name '*.yaml'); do
-            docker run --rm --volume "$PWD":/workdir mikefarah/yq "$f" > /dev/null
-          done
+      - name: Check workflow files
+        # uses: docker://rhysd/actionlint:latest
+        # with:
+        #   args: -color github/workflows/*.yaml github/workflows/*/*.yaml
+        # @todo Can we make globbing work in `with.args`?
+        run: |
+          docker run --rm --volume "$PWD":/repo --workdir /repo rhysd/actionlint:latest -color github/workflows/*.yaml github/workflows/*/*.yaml
 
   shellcheck:
     runs-on: ubuntu-latest
