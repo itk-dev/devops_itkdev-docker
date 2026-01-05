@@ -48,12 +48,15 @@ jobs:
           docker compose exec phpfpm composer install --no-interaction
 
       - name: Install site
+        # https://docs.github.com/en/actions/reference/security/secure-use#good-practices-for-mitigating-script-injection-attacks
+        env:
+          HASH_SALT: ${{ github.head_ref }}
         run: |
           # Add some local settings.
-          cat > web/sites/default/settings.local.php <<'EOF'
+          cat > web/sites/default/settings.local.php <<EOF
           <?php
 
-          $settings['hash_salt'] = '${{ github.head_ref }}';
+          \$settings['hash_salt'] = '$HASH_SALT';
           EOF
 
           # Install the site from config
@@ -61,7 +64,7 @@ jobs:
 
       - name: Show site URL
         run: |
-          echo $(docker compose exec phpfpm vendor/bin/drush --uri=http://$(docker compose port nginx 8080) user:login)
+          docker compose exec phpfpm vendor/bin/drush --uri="http://$(docker compose port nginx 8080)" user:login
 
   update-site:
     # Check updating site only on pull request.
@@ -109,12 +112,14 @@ jobs:
           docker compose exec phpfpm composer install --no-interaction
 
       - name: Install site
+        env:
+          HASH_SALT: ${{ github.head_ref }}
         run: |
           # Add some local settings.
-          cat > web/sites/default/settings.local.php <<'EOF'
+          cat > web/sites/default/settings.local.php <<EOF
           <?php
 
-          $settings['hash_salt'] = '${{ github.head_ref }}';
+          \$settings['hash_salt'] = '$HASH_SALT';
           EOF
 
           # Install the site from config
@@ -122,11 +127,11 @@ jobs:
 
       - name: Show site URL
         run: |
-          echo $(docker compose exec phpfpm vendor/bin/drush --uri=http://$(docker compose port nginx 8080) user:login)
+          docker compose exec phpfpm vendor/bin/drush --uri="http://$(docker compose port nginx 8080)" user:login
 
       - name: Clean up root stuff
         run: |
-          sudo chown -Rv $USER:$USER vendor/ web/ private-files/ || true
+          sudo chown -Rv "$USER:$USER" vendor/ web/ private-files/ || true
           sudo chmod -Rv a+w web/sites/default || true
 
       # Update site using our updated code.
@@ -150,4 +155,4 @@ jobs:
 
       - name: Show site URL
         run: |
-          echo $(docker compose exec phpfpm vendor/bin/drush --uri=http://$(docker compose port nginx 8080) user:login)
+          docker compose exec phpfpm vendor/bin/drush --uri="http://$(docker compose port nginx 8080)" user:login

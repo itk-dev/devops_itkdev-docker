@@ -1,0 +1,19 @@
+name: Actions
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  # https://github.com/rhysd/actionlint/blob/v1.7.10/docs/usage.md#use-actionlint-on-github-actions
+  actionlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check workflow files
+        uses: docker://rhysd/actionlint:latest
+        with:
+          args: -color
