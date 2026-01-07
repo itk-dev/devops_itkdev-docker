@@ -50,7 +50,7 @@ services:
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=websecure"
 
   memcached:
-    image: "memcached:latest"
+    image: memcached:alpine
     restart: unless-stopped
     networks:
       - app
