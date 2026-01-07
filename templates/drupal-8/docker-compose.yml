@@ -78,7 +78,7 @@ services:
       # - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
   memcached:
-    image: "memcached:latest"
+    image: memcached:alpine
     networks:
       - app
     ports:
