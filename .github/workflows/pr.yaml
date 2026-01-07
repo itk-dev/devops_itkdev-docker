@@ -21,16 +21,16 @@ jobs:
 
       - name: Validate local docker compose files
         run: |
-          DC=$(COMPOSE_DOMAIN=test.itkdev.dk docker compose --file templates/${{ matrix.version }}/docker-compose.yml config --quiet 2>&1)
+          DC=$(COMPOSE_DOMAIN=example.org docker compose --file templates/${{ matrix.version }}/docker-compose.yml config --quiet 2>&1)
           [ -z "$DC" ] || { echo $DC; exit 1; }
 
       - name: Validate server docker compose files
         run: |
-          DC=$(COMPOSE_SERVER_DOMAIN=test.itkdev.dk docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml config --quiet 2>&1)
+          DC=$(COMPOSE_SERVER_DOMAIN=example.org docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml config --quiet 2>&1)
           [ -z "$DC" ] || { echo $DC; exit 1; }
-          DC=$(COMPOSE_SERVER_DOMAIN=test.itkdev.dk docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.dev.yml config --quiet 2>&1)
+          DC=$(COMPOSE_SERVER_DOMAIN=example.org docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.dev.yml config --quiet 2>&1)
           [ -z "$DC" ] || { echo $DC; exit 1; }
-          DC=$(COMPOSE_SERVER_DOMAIN=test.itkdev.dk docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.redirect.yml config --quiet 2>&1)
+          DC=$(COMPOSE_SERVER_DOMAIN=example.org docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.redirect.yml config --quiet 2>&1)
           [ -z "$DC" ] || { echo $DC; exit 1; }
 
   validate-nginx-conf:
@@ -53,4 +53,4 @@ jobs:
 
       - name: Validate nginx conf
         run: |
-          COMPOSE_DOMAIN=test.itkdev.dk docker compose --file templates/${{ matrix.version }}/${{ matrix.compose_file}} run --rm nginx nginx -t
+          COMPOSE_DOMAIN=example.org docker compose --file templates/${{ matrix.version }}/${{ matrix.compose_file}} run --rm nginx nginx -t
