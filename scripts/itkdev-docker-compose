@@ -828,8 +828,10 @@ EOF
     if [ -d $docker_compose_dir/web ]; then
       root=/app/web
     fi
-    if [ -e $docker_compose_dir/vendor/bin/drush ]; then
-      docker_compose exec phpfpm php /app/vendor/bin/drush --root=$root "$@"
+    if [ -e $docker_compose_dir/vendor/bin/drush.php ]; then
+      docker_compose exec phpfpm php /app/vendor/bin/drush.php --root=$root "$@"
+    elif [ -e $docker_compose_dir/vendor/bin/drush ]; then
+      docker_compose exec phpfpm /app/vendor/bin/drush --root=$root "$@"
     else
       docker_compose run --rm drush --root=$root "$@"
     fi
