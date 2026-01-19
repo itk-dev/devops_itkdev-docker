@@ -68,6 +68,7 @@ services:
       - .:/app
     environment:
       NGINX_FPM_SERVICE: ${COMPOSE_PROJECT_NAME}-phpfpm-1:9000
+      NGINX_CRON_METRICS: ${COMPOSE_PROJECT_NAME}-phpfpm-1:9746
       NGINX_WEB_ROOT: /app/web
       NGINX_PORT: 8080
       NGINX_MAX_BODY_SIZE: 5M
@@ -78,6 +79,9 @@ services:
       # HTTPS config - uncomment to enable redirect from :80 to :443
       # - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=redirect-to-https"
       # - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      # Cron-metrics protection.
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-metrics.rule=Host(`${COMPOSE_DOMAIN}`) && PathPrefix(`/cron-metrics`) "
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-metrics.middlewares=ITKMetricsAuth@file"
 
   memcached:
     image: memcached:alpine
