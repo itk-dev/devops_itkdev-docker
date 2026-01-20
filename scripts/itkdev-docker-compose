@@ -429,6 +429,8 @@ EOF
   trap " " INT
   # Start the docker compose with Xdebug enabled
   # @todo Should we disable logs, e.g. by sending it to /dev/null?
+  # Note: `DRUSH_ALLOW_XDEBUG=1` is set in our php*-fpm container to allow debugging Drush commands
+  # (cf. https://github.com/drush-ops/drush/blob/14.x/docs/commands.md#xdebug)
   PHP_XDEBUG_MODE=debug PHP_XDEBUG_WITH_REQUEST=yes docker_compose up
   trap - INT
 
@@ -743,9 +745,9 @@ EOF
     ;;
 
   xdebug3)
-    PHP_XDEBUG_MODE=debug \
-    PHP_XDEBUG_WITH_REQUEST=yes \
-    docker_compose up -d
+    # Note: `DRUSH_ALLOW_XDEBUG=1` is set in our php*-fpm container to allow debugging Drush commands
+    # (cf. https://github.com/drush-ops/drush/blob/14.x/docs/commands.md#xdebug)
+    PHP_XDEBUG_MODE=debug PHP_XDEBUG_WITH_REQUEST=yes docker_compose up --detach
 
     cat <<'EOF' | sed "s|«project directory»|$PWD|"
 
@@ -824,17 +826,7 @@ EOF
     ;;
 
   drush)
-    root=/app
-    if [ -d $docker_compose_dir/web ]; then
-      root=/app/web
-    fi
-    if [ -e $docker_compose_dir/vendor/bin/drush.php ]; then
-      docker_compose exec phpfpm php /app/vendor/bin/drush.php --root=$root "$@"
-    elif [ -e $docker_compose_dir/vendor/bin/drush ]; then
-      docker_compose exec phpfpm /app/vendor/bin/drush --root=$root "$@"
-    else
-      docker_compose run --rm drush --root=$root "$@"
-    fi
+    docker_compose exec phpfpm vendor/bin/drush "$@"
     ;;
 
   composer)
