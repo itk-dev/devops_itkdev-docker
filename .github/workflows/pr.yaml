@@ -3,6 +3,13 @@ name: Review
 jobs:
   validate-compose:
     runs-on: ubuntu-latest
+    env: &env
+      # All environment variables that require a non-empty value in our compose
+      # files (cf.
+      # https://docs.docker.com/reference/compose-file/interpolation/)
+      COMPOSE_DOMAIN: test.local.example.org
+      COMPOSE_PROJECT_NAME: test_project
+      COMPOSE_SERVER_DOMAIN: test.example.org
     strategy:
       fail-fast: false
       matrix:
@@ -21,20 +28,21 @@ jobs:
 
       - name: Validate local docker compose files
         run: |
-          DC=$(COMPOSE_DOMAIN=example.org docker compose --file templates/${{ matrix.version }}/docker-compose.yml config --quiet 2>&1)
+          DC=$(docker compose --file templates/${{ matrix.version }}/docker-compose.yml config --quiet 2>&1)
           [ -z "$DC" ] || { echo $DC; exit 1; }
 
       - name: Validate server docker compose files
         run: |
-          DC=$(COMPOSE_SERVER_DOMAIN=example.org docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml config --quiet 2>&1)
+          DC=$(docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml config --quiet 2>&1)
           [ -z "$DC" ] || { echo $DC; exit 1; }
-          DC=$(COMPOSE_SERVER_DOMAIN=example.org docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.dev.yml config --quiet 2>&1)
+          DC=$(docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.dev.yml config --quiet 2>&1)
           [ -z "$DC" ] || { echo $DC; exit 1; }
-          DC=$(COMPOSE_SERVER_DOMAIN=example.org docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.redirect.yml config --quiet 2>&1)
+          DC=$(docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.redirect.yml config --quiet 2>&1)
           [ -z "$DC" ] || { echo $DC; exit 1; }
 
   validate-nginx-conf:
     runs-on: ubuntu-latest
+    env: *env
     strategy:
       fail-fast: false
       matrix:
@@ -53,4 +61,4 @@ jobs:
 
       - name: Validate nginx conf
         run: |
-          COMPOSE_DOMAIN=example.org docker compose --file templates/${{ matrix.version }}/${{ matrix.compose_file}} run --rm nginx nginx -t
+          docker compose --file templates/${{ matrix.version }}/${{ matrix.compose_file}} run --rm nginx nginx -t
