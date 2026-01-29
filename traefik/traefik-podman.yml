@@ -1,0 +1,23 @@
+api:
+  dashboard: true
+  insecure: true
+  debug: true
+  disableDashboardAd: true
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+    http:
+      tls: {}
+
+providers:
+  file:
+    directory: /config
+  docker:
+    endpoint: "tcp://10.89.0.1:2375"
+    exposedByDefault: false
+
+serversTransport:
+  insecureSkipVerify: true

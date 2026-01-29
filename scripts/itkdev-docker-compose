@@ -5,6 +5,80 @@ IFS=$'\n\t'
 bold=$(tput -Txterm-256color bold)
 normal=$(tput -Txterm-256color sgr0)
 
+# Container runtime detection
+detect_container_runtime() {
+    if [ -n "${CONTAINER_CLI:-}" ]; then
+        echo "$CONTAINER_CLI"
+        return
+    fi
+
+    if command -v podman &> /dev/null; then
+        echo "podman"
+    elif command -v docker &> /dev/null; then
+        echo "docker"
+    else
+        echo ""
+    fi
+}
+
+CONTAINER_CLI=$(detect_container_runtime)
+if [ -z "$CONTAINER_CLI" ]; then
+    (>&2 echo "${bold}Neither podman nor docker found${normal}")
+    exit 1
+fi
+
+# Socket path detection
+detect_socket_path() {
+    if [ "$CONTAINER_CLI" = "podman" ]; then
+        # macOS with podman machine - use socket path inside the VM
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # Containers run inside the Podman machine VM, where the socket is at /run/podman/podman.sock
+            echo "/run/podman/podman.sock"
+            return
+        fi
+        # Rootless Podman (Linux)
+        local rootless_sock="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/podman/podman.sock"
+        if [ -S "$rootless_sock" ]; then
+            echo "$rootless_sock"
+            return
+        fi
+        # Rootful Podman
+        if [ -S "/run/podman/podman.sock" ]; then
+            echo "/run/podman/podman.sock"
+            return
+        fi
+        # Fallback
+        echo "/run/podman/podman.sock"
+    else
+        echo "/var/run/docker.sock"
+    fi
+}
+
+export CONTAINER_SOCK=$(detect_socket_path)
+
+# Podman machine detection (for macOS)
+detect_podman_machine() {
+    # Get the name of the currently running podman machine
+    local running_machine
+    running_machine=$(podman machine list --format '{{.Name}} {{.Running}}' 2>/dev/null | grep ' true$' | awk '{print $1}' | head -1)
+    if [ -n "$running_machine" ]; then
+        echo "$running_machine"
+        return 0
+    fi
+    return 1
+}
+
+PODMAN_MACHINE=""
+
+# macOS Podman machine check
+if [[ "$OSTYPE" == "darwin"* ]] && [ "$CONTAINER_CLI" = "podman" ]; then
+    PODMAN_MACHINE=$(detect_podman_machine)
+    if [ -z "$PODMAN_MACHINE" ]; then
+        (>&2 echo "${bold}No running Podman machine found. Start with: podman machine start${normal}")
+        exit 1
+    fi
+fi
+
 # @see https://stackoverflow.com/a/54839008
 fg_black_8=$(tput setaf 0)
 bg_green_8=$(tput setab 2)
@@ -184,6 +258,8 @@ normal=$(tput sgr0)
 function usage {
   cat <<'EOF'
 Usage: itkdev-docker-compose command [command arguments]
+
+Supports both Docker and Podman (auto-detected). Override with CONTAINER_CLI environment variable.
 
 Commands:
 
@@ -461,20 +537,86 @@ fi
 
 # Allow traefik:start without existence of .env
 if [[ "$#" -gt "0" && "$1" == "traefik:start" ]]; then
-  docker network inspect frontend >/dev/null 2>&1 || docker network create --driver=bridge --attachable --internal=false frontend
-  $(cd ${script_dir}/../traefik/; docker compose up -d)
+  $CONTAINER_CLI network inspect frontend >/dev/null 2>&1 || $CONTAINER_CLI network create --driver=bridge frontend
+
+  if [ "$CONTAINER_CLI" = "podman" ]; then
+    # For Podman: Start TCP API service and use Podman-specific traefik config
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      # Ensure we have a running podman machine
+      if [ -z "$PODMAN_MACHINE" ]; then
+        PODMAN_MACHINE=$(detect_podman_machine)
+        if [ -z "$PODMAN_MACHINE" ]; then
+          (>&2 echo "${bold}No running Podman machine found. Start with: podman machine start${normal}")
+          exit 1
+        fi
+      fi
+
+      # Start Podman API service in the VM if not already running
+      if ! podman machine ssh "$PODMAN_MACHINE" "pgrep -f 'podman.*system service.*tcp'" >/dev/null 2>&1; then
+        echo "Starting Podman API service on machine '$PODMAN_MACHINE'..."
+        podman machine ssh "$PODMAN_MACHINE" "nohup podman system service --time=0 tcp:0.0.0.0:2375 > /dev/null 2>&1 &"
+        sleep 2
+      fi
+    else
+      # Linux: Start Podman API service if not running
+      if ! pgrep -f "podman.*system service.*tcp" >/dev/null 2>&1; then
+        echo "Starting Podman API service..."
+        nohup podman system service --time=0 tcp:0.0.0.0:2375 > /dev/null 2>&1 &
+        sleep 2
+      fi
+    fi
+
+    # Detect the frontend network gateway IP for Podman API endpoint
+    GATEWAY_IP=$($CONTAINER_CLI network inspect frontend --format '{{range .Subnets}}{{.Gateway}}{{end}}' 2>/dev/null | head -1)
+    if [ -z "$GATEWAY_IP" ]; then
+      GATEWAY_IP="10.89.0.1"  # Fallback
+    fi
+
+    # Generate Podman-specific traefik config with correct gateway IP
+    cat >| "${script_dir}/../traefik/traefik-podman.yml" <<EOF
+api:
+  dashboard: true
+  insecure: true
+  debug: true
+  disableDashboardAd: true
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+    http:
+      tls: {}
+
+providers:
+  file:
+    directory: /config
+  docker:
+    endpoint: "tcp://${GATEWAY_IP}:2375"
+    exposedByDefault: false
+
+serversTransport:
+  insecureSkipVerify: true
+EOF
+
+    # Use Podman-specific traefik config (no socket-proxy needed)
+    (cd ${script_dir}/../traefik/; TRAEFIK_CONFIG=traefik-podman.yml $CONTAINER_CLI compose up -d traefik)
+  else
+    # For Docker: Use socket-proxy with Docker-specific setup
+    (cd ${script_dir}/../traefik/; COMPOSE_PROFILES=docker CONTAINER_SOCK=${CONTAINER_SOCK} $CONTAINER_CLI compose up -d)
+  fi
   exit
 fi
 
 # Allow traefik:stop without existence of .env
 if [[ "$#" -gt "0" && "$1" == "traefik:stop" ]]; then
-  $(cd ${script_dir}/../traefik/; docker compose down --volumes)
+  (cd ${script_dir}/../traefik/; $CONTAINER_CLI compose down --volumes)
   exit
 fi
 
 # Allow traefik:pull without existence of .env
 if [[ "$#" -gt "0" && "$1" == "traefik:pull" ]]; then
-  $(cd ${script_dir}/../traefik/; docker compose pull)
+  (cd ${script_dir}/../traefik/; $CONTAINER_CLI compose pull)
   exit
 fi
 
@@ -535,7 +677,7 @@ fi
 
 # Check if revers proxy is running and print warning if not.
 set +o errexit
-is_treafik_running=$(docker inspect -f '{{.State.Running}}' traefik 2>/dev/null)
+is_treafik_running=$($CONTAINER_CLI inspect -f '{{.State.Running}}' traefik 2>/dev/null)
 set -o errexit
 
 if [ ! "$is_treafik_running" == "true" ]; then
@@ -546,7 +688,7 @@ fi
 docker_compose () {
     # Note: Apparently, using --project-directory or --file options for `docker compose` will break use of `$PWD` in
     # compose file. Therefore, we `cd` before running `docker compose` command.
-    (cd "$docker_compose_dir" && COMPOSE_DOMAIN=${COMPOSE_DOMAIN} docker compose "$@")
+    (cd "$docker_compose_dir" && COMPOSE_DOMAIN=${COMPOSE_DOMAIN} $CONTAINER_CLI compose "$@")
 }
 
 cmd="$1"
@@ -579,7 +721,7 @@ case "$cmd" in
       # Get traefik host from label
       # https://stedolan.github.io/jq/manual/#test(val),test(regex;flags)
       # https://stedolan.github.io/jq/manual/#capture(val),capture(regex;flags)
-      traefik_host=$(docker inspect --format '{{ json .Config.Labels }}' $(docker_compose ps -q $service) | jq --raw-output '. | [to_entries[] | select(.key | test("^traefik\\.http\\.routers\\..+\\.rule$")) | select(.value | test("^Host\\(`(?<host>.+)`\\)$"))] | first | .value//"" | capture("^Host\\(`(?<host>.+)`\\)$") | .host//""')
+      traefik_host=$($CONTAINER_CLI inspect --format '{{ json .Config.Labels }}' $(docker_compose ps -q $service) | jq --raw-output '. | [to_entries[] | select(.key | test("^traefik\\.http\\.routers\\..+\\.rule$")) | select(.value | test("^Host\\(`(?<host>.+)`\\)$"))] | first | .value//"" | capture("^Host\\(`(?<host>.+)`\\)$") | .host//""')
     fi
 
     if ! [ -z "$traefik_host" ]; then
@@ -663,12 +805,12 @@ EOF
     if ! [ -t 0 ]; then
       exec_args+=("--no-TTY")
     fi
-    docker compose exec "${exec_args[@]}" $db_service mysql --user=db --password=db --database=db "$@"
+    docker_compose exec "${exec_args[@]}" $db_service mysql --user=db --password=db --database=db "$@"
     ;;
 
   sql:connect)
     db_service=mariadb
-    echo docker compose exec $db_service mysql --user=db --password=db db
+    echo $CONTAINER_CLI compose exec $db_service mysql --user=db --password=db db
     ;;
 
   sql:open)
@@ -710,14 +852,14 @@ EOF
     ;;
 
   traefik:url)
-    label=$(docker inspect --format '{{ index .Config.Labels "traefik.http.routers.traefik.rule"}}' traefik)
+    label=$($CONTAINER_CLI inspect --format '{{ index .Config.Labels "traefik.http.routers.traefik.rule"}}' traefik)
     url=$(echo "${label}" | sed -n 's/[^(]*(.\(.*\).)/\1/p')
     echo http://${url}:8080;
     ;;
 
   traefik:logs)
-    echo "docker logs --tail 20 traefik"
-    docker logs --tail 20 traefik
+    echo "$CONTAINER_CLI logs --tail 20 traefik"
+    $CONTAINER_CLI logs --tail 20 traefik
     ;;
 
   mail:url)
@@ -816,12 +958,12 @@ EOF
     ;;
 
   images:pull)
-    docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "<none>" | sort | uniq
+    $CONTAINER_CLI images --format "{{.Repository}}:{{.Tag}}" | grep -v "<none>" | sort | uniq
     read -p "Are you sure you want to update all images? " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
-      docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "<none>" | sort | uniq | xargs -L1 docker pull
+      $CONTAINER_CLI images --format "{{.Repository}}:{{.Tag}}" | grep -v "<none>" | sort | uniq | xargs -L1 $CONTAINER_CLI pull
     fi
     ;;
 
