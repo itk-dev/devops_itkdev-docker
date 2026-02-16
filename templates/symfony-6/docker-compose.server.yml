@@ -48,5 +48,5 @@ services:
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}.rule=Host(`${COMPOSE_SERVER_DOMAIN:?}`)"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}.entrypoints=websecure"
       # Cron-metrics protection.
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}-metrics.rule=Host(`${COMPOSE_DOMAIN:?}`) && PathPrefix(`/cron-metrics`) "
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}-metrics.rule=Host(`${COMPOSE_SERVER_DOMAIN:?}`) && PathPrefix(`/cron-metrics`) "
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}-metrics.middlewares=ITKMetricsAuth@file"
