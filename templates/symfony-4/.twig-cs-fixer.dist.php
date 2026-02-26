@@ -1,1 +1,0 @@
-../../config/symfony/twig/.twig-cs-fixer.dist.php
