@@ -18,11 +18,10 @@ jobs:
       matrix:
         version: &template_version
           - drupal
-          - drupal-10
-          - drupal-11
           - drupal-8
           - drupal-9
-          - drupal-module
+          - drupal-10
+          - drupal-11
           - symfony
           - symfony-6
           - symfony-7
@@ -33,17 +32,13 @@ jobs:
 
       - name: Validate local docker compose files
         run: |
-          DC=$(docker compose --file templates/${{ matrix.version }}/docker-compose.yml config --quiet 2>&1)
-          [ -z "$DC" ] || { echo $DC; exit 1; }
+          docker compose --file templates/${{ matrix.version }}/docker-compose.yml config
 
       - name: Validate server docker compose files
         run: |
-          DC=$(docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml config --quiet 2>&1)
-          [ -z "$DC" ] || { echo $DC; exit 1; }
-          DC=$(docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.dev.yml config --quiet 2>&1)
-          [ -z "$DC" ] || { echo $DC; exit 1; }
-          DC=$(docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.redirect.yml config --quiet 2>&1)
-          [ -z "$DC" ] || { echo $DC; exit 1; }
+          docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml config
+          docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.dev.yml config
+          docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.redirect.yml config
 
   validate-nginx-conf:
     runs-on: ubuntu-latest

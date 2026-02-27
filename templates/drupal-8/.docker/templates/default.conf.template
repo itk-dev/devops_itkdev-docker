@@ -49,8 +49,7 @@ server {
     }
 
     # Block access to "hidden" files and directories whose names begin with a
-    # period. This includes directories used by version control systems such
-    # as Subversion or Git to store control files.
+    # period.
     location ~ (^|/)\. {
         return 403;
     }
@@ -76,12 +75,13 @@ server {
     }
 
     location ~ '\.php$|^/update.php' {
+        include fastcgi_params;
+
         fastcgi_buffers 16 32k;
         fastcgi_buffer_size 64k;
         fastcgi_busy_buffers_size 64k;
 
         fastcgi_split_path_info ^(.+?\.php)(|/.*)$;
-        include fastcgi_params;
 
         fastcgi_param HTTP_PROXY "";
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
