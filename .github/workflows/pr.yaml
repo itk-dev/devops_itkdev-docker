@@ -96,3 +96,17 @@ jobs:
           diff -qr templates/"${{ matrix.version }}" "$test_dir"
 
           rm -fr "$(dirname "$test_dir")"
+
+  check-bash-completion:
+    runs-on: ubuntu-latest
+
+    name: Check that Bash completion is up to date
+    steps:
+      - uses: actions/checkout@v5
+      - uses: go-task/setup-task@v1
+
+      - name: Build completion
+        run: task completion:build
+
+      - name: Check that nothing has changed
+        run: git diff --exit-code
