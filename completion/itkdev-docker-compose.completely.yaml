@@ -1,0 +1,173 @@
+# https://github.com/bashly-framework/completely?tab=readme-ov-file#configuration-syntax
+
+itkdev-docker-compose:
+  - --help
+
+  # url [service [port]]
+  #               Print url to site or a service
+  #
+  #               Protip: run
+  #
+  #                 brew install jq
+  #
+  #               for improved handling of Traefik host names using jq (https://stedolan.github.io/jq/).
+  - url
+
+  # open [service [port]]
+  #               Open url in default browser
+  - open
+
+  # drush
+  #               Run drush command. If drush in installed via composer,
+  #               the vendor/bin/drush command is run inside the phpfpm
+  #               container. Otherwise, the drush container is used to
+  #               run the command.
+  - drush
+
+  # self:update
+  #               Update this script and other stuff.
+  - self:update
+
+  # sync
+  #               Sync both database and files.
+  - sync
+
+  # sync:db
+  #               Sync database base on 'REMOTE_DB_DUMP_CMD' in the env
+  #               file.
+  #
+  #               If 'SYNC_DB_POST_SCRIPT' is set, it will be eval'ed after
+  #               importing the remote database.
+  - sync:db
+
+  # sync:files
+  #               Sync files base on 'REMOTE_PATH' or 'LOCAL_PATH' in
+  #               the env file.
+  - sync:files
+
+  # sql:cli
+  #               Open MySQL client to the database (named `db`) in the database
+  #               container (`mariadb`).
+  #
+  #               Execute a SQL query from the command line:
+  #
+  #                 itkdev-docker-compose sql:cli --table <<< 'SHOW TABLES'
+  #
+  #               Run a SQL script:
+  #
+  #                 itkdev-docker-compose sql:cli < query.sql
+  - sql:cli
+
+  # sql:connect
+  #               Print mysql command for connecting to database (named
+  #               `db`) in the database container (`mariadb`).
+  #
+  #               Use `$(itkdev-docker-compose sql:connect)` to open the
+  #               database cli.
+  - sql:connect
+
+  # sql:log
+  #               Log SQL queries sent to database.
+  - sql:log
+
+  # sql:open
+  #               Open database GUI and connect to MariaDB.
+  - sql:open
+
+  # sql:port
+  #               Display the exposed MariaDB SQL server port.
+  - sql:port
+
+  # template:install name [--force] [--list]
+  #               Install a named docker-composer template in the current
+  #               directory.
+  - template:install:
+      - --force
+      - --list
+      - $(itkdev-docker-compose template:install --list-compact 2>/dev/null)
+
+  # template:update [--force]
+  #               Update template installed in project.
+  - template:update:
+      - --force
+
+  # traefik:start
+  #               Start traefik reverse proxy.
+  - traefik:start
+
+  # traefik:stop
+  #               Stop traefik reverse proxy
+  - traefik:stop
+
+  # traefik:url
+  #               URL for the administrative UI for traefik.
+  - traefik:url
+
+  # traefik:open
+  #               Open the administrative UI for traefik.
+  - traefik:open
+
+  # traefik:logs
+  #               See traefik logs
+  - traefik:logs
+
+  # traefik:pull
+  #               Pull latest traefik & socket-proxy containers
+  - traefik:pull
+
+  # mail:url
+  #               URL for the test mail web interface.
+  - mail:url
+
+  # mail:open
+  #               Open test mail web interface in default browser.
+  - mail:open
+
+  # mailhog:url
+  #               URL for the mailhog web-interface.
+  - mailhog:url
+
+  # mailhog:open
+  #               Open mailhog url in default browser
+  - mailhog:open
+
+  # xdebug
+  #               Boot the containers with PHP xdebug support enabled.
+  - xdebug
+
+  # xdebug3
+  #               Boot the containers with PHP xdebug support enabled.
+  #               Consider using `xdebug` for an improved developer experience.
+  - xdebug3
+
+  # hosts:insert
+  #               Insert the docker site url into the hosts file.
+  - hosts:insert
+
+  # images:pull
+  #               Update/pull all docker images.
+  - images:pull
+
+  # shell [service name]
+  #               Enter into /usr/bin/env sh inside container. E.g. itkdev-docker-compose shell phpfpm
+  - shell
+
+  # composer
+  #               Run composer command inside phpfpm container
+  - composer
+
+  # php
+  #               Run php command inside phpfpm container
+  - php
+
+  # bin/*
+  # vendor/bin/*
+  #               Run command command inside phpfpm container
+
+  # down
+  #               Stop and remove containers, networks, images, and volumes
+  - down
+
+  # version
+  #               Display this tool's current version
+  - version
