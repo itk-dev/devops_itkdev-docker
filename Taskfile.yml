@@ -4,6 +4,9 @@ version: "3"
 
 includes:
   github-actions: ./task/Taskfile.github-actions.yml
+  completion:
+    taskfile: ./completion/Taskfile.yml
+    dir: ./completion
 
 vars:
   GITHUB_ACTIONS_TEMPLATES_HEADER: |

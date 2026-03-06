@@ -51,6 +51,7 @@ function self_update {
 function template_install {
   local force=0
   local list=0
+  local list_compact=0
   local name=""
 
   for var in "$@"
@@ -62,6 +63,9 @@ function template_install {
       --list)
         list=1
         ;;
+      --list-compact)
+        list_compact=1
+        ;;
       *)
         name="$var"
         ;;
@@ -71,6 +75,14 @@ function template_install {
   local templates_dir=$script_dir/../templates
   local source_dir=$templates_dir/$name/
   local target_dir=$PWD
+
+  if [ "$list_compact" -eq 1 ]; then
+    for name in $(find "$templates_dir" -mindepth 1 -maxdepth 1 -type d | sort --version-sort); do
+      echo -n "$(basename $name) "
+    done
+    echo
+    exit 0
+  fi
 
   if [ "$list" -eq 1 ]; then
     echo Templates:
@@ -481,6 +493,12 @@ fi
 # Allow version without existence of compose file.
 if [[ "$#" -gt "0" && "$1" == "version" ]]; then
   echo Version: ${VERSION}
+  exit
+fi
+
+# Allow completion without existence of compose file.
+if [[ "$#" -gt "0" && "$1" == "completions" ]]; then
+  cat ${script_dir}/../completion/itkdev-docker-compose-completion.bash
   exit
 fi
 

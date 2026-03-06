@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: "3"
+
+env:
+  COMPLETELY_CONFIG_PATH: itkdev-docker-compose.completely.yaml
+  COMPLETELY_OUTPUT_PATH: itkdev-docker-compose-completion.bash
+
+tasks:
+  build:
+    desc: Build completion script for Bash
+    cmds:
+      - task: completely
+        vars:
+          TASK_ARGS: generate
+
+  test:
+    desc: Template completions
+    cmds:
+      # Notice: The completions are not sorted alphabetically when running `completely test`.
+      - for:
+          - "itkdev-docker-compose -"
+          - "itkdev-docker-compose u"
+          - "itkdev-docker-compose op"
+          - "itkdev-docker-compose dru"
+          - "itkdev-docker-compose s"
+          - "itkdev-docker-compose sy"
+          - "itkdev-docker-compose sync:"
+          - "itkdev-docker-compose templa"
+          - "itkdev-docker-compose template:install -"
+          - "itkdev-docker-compose template:install "
+        task: completely
+        vars:
+          TASK_ARGS: test '{{.ITEM}}'
+        silent: true
+
+  completely:
+    desc: Run completely (https://github.com/bashly-framework/completely). Example `{{.TASK}} preview`
+    cmds:
+      - docker run --rm --env COMPLETELY_CONFIG_PATH --env COMPLETELY_OUTPUT_PATH --env COMPLETELY_DEBUG --user $(id -u):$(id -g) --volume "$PWD:/app" dannyben/completely {{.TASK_ARGS}} {{.CLI_ARGS}}

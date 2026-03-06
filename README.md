@@ -127,19 +127,27 @@ The certificate is located in `./treafik/ssl/docker.crt` in this repository.
 
 ### Bash
 
-You can install completions for `bash` by running:
+You can install completions for `bash` by adding
 
 ```sh
-ln -s $(git rev-parse --show-toplevel)/completion/bash/itkdev-docker-compose-completion.bash $(brew --prefix)/etc/bash_completion.d/itkdev-docker-compose
+eval "$(itkdev-docker-compose completions)"
 ```
+
+to your `~/.bashrc`.
 
 ### Zsh
 
-You can install completions for `zsh` by updating `fpath` in `~/.zshrc`, e.g. by running:
+Add
 
 ```sh
-echo "fpath=($(git rev-parse --show-toplevel)/completion/zsh \$fpath) # itkdev-docker " >> ~/.zshrc
+# Load completion functions
+autoload -Uz +X compinit && compinit
+autoload -Uz +X bashcompinit && bashcompinit
+
+eval "$(itkdev-docker-compose completions)"
 ```
+
+to your `~/.zshrc`. If you are using Oh-My-Zsh, you can leave out the `autoload` incantations.
 
 ### Docker UI
 
