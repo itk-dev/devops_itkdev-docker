@@ -1,0 +1,1 @@
+../../config/symfony/php/.php-cs-fixer.dist.php

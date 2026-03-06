@@ -18,8 +18,6 @@ function strip-project-type() {
   echo "$name"
 }
 
-find templates -type l -delete
-
 for template_dir in templates/*; do
   template_name=$(basename "$template_dir")
 
@@ -27,11 +25,11 @@ for template_dir in templates/*; do
   echo
 
   project_type=""
-  if [[ "$template_name" =~ ^drupal-module ]]; then
+  if [[ "$template_name" =~ ^drupal-module$ ]]; then
     project_type="drupal-module"
-  elif [[ "$template_name" =~ ^drupal- ]]; then
+  elif [[ "$template_name" =~ ^drupal(-|$) ]]; then
     project_type="drupal"
-  elif [[ "$template_name" =~ ^symfony- ]]; then
+  elif [[ "$template_name" =~ ^symfony(-|$) ]]; then
     project_type="symfony"
   else
     (>&2 echo "Unknown template type: $template_name")

@@ -41,12 +41,8 @@ services:
       - PHP_SENDMAIL_PATH=/usr/bin/msmtp --host=mail --port=1025 --read-recipients --read-envelope-from
       - DOCKER_HOST_DOMAIN=${COMPOSE_DOMAIN:?}
       - PHP_IDE_CONFIG=serverName=localhost
-      # Let drush know the site uri (makes using --uri redundant)
-      - DRUSH_OPTIONS_URI=http://${COMPOSE_DOMAIN:?}
     depends_on:
       mariadb:
-        condition: service_healthy
-      memcached:
         condition: service_healthy
     volumes:
       - .:/app
@@ -66,32 +62,19 @@ services:
     environment:
       NGINX_FPM_SERVICE: ${COMPOSE_PROJECT_NAME:?}-phpfpm-1:9000
       NGINX_CRON_METRICS: ${COMPOSE_PROJECT_NAME:?}-phpfpm-1:9746
-      NGINX_WEB_ROOT: /app/web
+      NGINX_WEB_ROOT: /app/public
       NGINX_PORT: 8080
       NGINX_MAX_BODY_SIZE: 5M
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=frontend"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}.rule=Host(`${COMPOSE_DOMAIN:?}`)"
-      # HTTPS config - enable redirect from :80 to :443
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      # HTTPS config - uncomment to enable redirect from :80 to :443
+      # - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}.middlewares=redirect-to-https"
+      # - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       # Cron-metrics protection.
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}-metrics.rule=Host(`${COMPOSE_DOMAIN:?}`) && PathPrefix(`/cron-metrics`) "
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:?}-metrics.middlewares=ITKMetricsAuth@file"
-
-  memcached:
-    image: memcached:alpine
-    networks:
-      - app
-    ports:
-      - "11211"
-    healthcheck:
-      test: echo "version" | nc -vn -w 1 127.0.0.1 11211
-      interval: 10s
-      retries: 60
-    environment:
-      - MEMCACHED_CACHE_SIZE=64
 
   mail:
     image: axllent/mailpit

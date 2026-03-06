@@ -10,35 +10,35 @@ jobs:
       COMPOSE_DOMAIN: test.local.example.org
       COMPOSE_PROJECT_NAME: test_project
       COMPOSE_SERVER_DOMAIN: test.example.org
+
+      TERM: xterm-256color
+
     strategy:
       fail-fast: false
       matrix:
         version: &template_version
-          - drupal-7
+          - drupal
           - drupal-8
           - drupal-9
           - drupal-10
           - drupal-11
-          - symfony-3
-          - symfony-4
+          - symfony
           - symfony-6
+          - symfony-7
+          - symfony-8
     name: Validate compose (${{ matrix.version }})
     steps:
       - uses: actions/checkout@v5
 
       - name: Validate local docker compose files
         run: |
-          DC=$(docker compose --file templates/${{ matrix.version }}/docker-compose.yml config --quiet 2>&1)
-          [ -z "$DC" ] || { echo $DC; exit 1; }
+          docker compose --file templates/${{ matrix.version }}/docker-compose.yml config
 
       - name: Validate server docker compose files
         run: |
-          DC=$(docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml config --quiet 2>&1)
-          [ -z "$DC" ] || { echo $DC; exit 1; }
-          DC=$(docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.dev.yml config --quiet 2>&1)
-          [ -z "$DC" ] || { echo $DC; exit 1; }
-          DC=$(docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.redirect.yml config --quiet 2>&1)
-          [ -z "$DC" ] || { echo $DC; exit 1; }
+          docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml config
+          docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.dev.yml config
+          docker compose --file templates/${{ matrix.version }}/docker-compose.server.yml --file templates/${{ matrix.version }}/docker-compose.redirect.yml config
 
   validate-nginx-conf:
     runs-on: ubuntu-latest
@@ -62,3 +62,37 @@ jobs:
       - name: Validate nginx conf
         run: |
           docker compose --file templates/${{ matrix.version }}/${{ matrix.compose_file}} run --rm nginx nginx -t
+
+  test-template-install:
+    runs-on: ubuntu-latest
+    env: *env
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: *template_version
+
+    name: Test template install (${{ matrix.version }})
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install and check template
+        run: |
+          script_dir="$PWD/scripts"
+          test_dir="tmp/${{ matrix.version }}"
+
+          mkdir -p "$test_dir"
+          cd "$test_dir"
+          yes | "$script_dir/itkdev-docker-compose" template:install "${{ matrix.version }}" || true
+          # Remove .env file generated during template install
+          rm .env
+          cd -
+          pwd
+
+          # Check that we have no symlinks in the project.
+          find "$test_dir" -type l | grep . && exit 1
+
+          # Check that project files are exact copies of the template files.
+          diff -qr templates/"${{ matrix.version }}" "$test_dir"
+
+          rm -fr "$(dirname "$test_dir")"

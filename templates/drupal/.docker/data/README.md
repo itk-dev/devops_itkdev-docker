@@ -9,7 +9,7 @@ If a container needs to persist data between restarts you can map the relevant f
 
 If you are using RabbitMQ running in a container as a message broker you need to configure a persistent volume for
 RabbitMQs data directory to avoid losing message on container restarts.
-
+x
 ```yaml
 # docker-compose.server.override.yml
 
