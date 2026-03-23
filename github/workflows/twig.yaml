@@ -28,10 +28,20 @@ env:
 
 on:
   pull_request:
+    paths:
+      - '**/*.twig'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'docker-compose.yml'
   push:
     branches:
       - main
       - develop
+    paths:
+      - '**/*.twig'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'docker-compose.yml'
 
 jobs:
   twig-lint:

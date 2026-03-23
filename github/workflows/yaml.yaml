@@ -22,10 +22,18 @@ name: YAML
 
 on:
   pull_request:
+    paths:
+      - '**/*.yml'
+      - '**/*.yaml'
+      - 'docker-compose.yml'
   push:
     branches:
       - main
       - develop
+    paths:
+      - '**/*.yml'
+      - '**/*.yaml'
+      - 'docker-compose.yml'
 
 jobs:
   yaml-lint:

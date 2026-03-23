@@ -15,10 +15,18 @@ name: Styles
 
 on:
   pull_request:
+    paths:
+      - 'web/themes/custom/**/css/**/*.css'
+      - 'web/themes/custom/**/css/**/*.scss'
+      - 'docker-compose.yml'
   push:
     branches:
       - main
       - develop
+    paths:
+      - 'web/themes/custom/**/css/**/*.css'
+      - 'web/themes/custom/**/css/**/*.scss'
+      - 'docker-compose.yml'
 
 jobs:
   styles-lint:

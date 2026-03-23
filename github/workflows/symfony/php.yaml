@@ -38,10 +38,20 @@ env:
 
 on:
   pull_request:
+    paths:
+      - '**/*.php'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'docker-compose.yml'
   push:
     branches:
       - main
       - develop
+    paths:
+      - '**/*.php'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'docker-compose.yml'
 
 jobs:
   coding-standards:
