@@ -56,10 +56,7 @@ tasks:
     desc: "Lint YAML"
     cmds:
       - |
-        # docker pull mikefarah/yq
-        for f in $(find github/workflows/ -name '*.yaml'); do
-          docker run --rm --volume "$PWD":/workdir mikefarah/yq "$f" > /dev/null
-        done
+        docker compose run --rm prettier '**/*.{yml,yaml}' --check
 
   default:
     cmds:

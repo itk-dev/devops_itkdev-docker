@@ -1,5 +1,11 @@
-on: pull_request
-name: Review
+on:
+  pull_request:
+    paths:
+      - "templates/**"
+      - "scripts/**"
+      - "completion/**"
+
+name: Templates
 jobs:
   validate-compose:
     runs-on: ubuntu-latest
@@ -28,7 +34,7 @@ jobs:
           - symfony-8
     name: Validate compose (${{ matrix.version }})
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Validate local docker compose files
         run: |
@@ -53,7 +59,7 @@ jobs:
 
     name: Validate nginx conf (${{ matrix.version }}/${{ matrix.compose_file}})
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Create docker network
         run: |
@@ -74,7 +80,7 @@ jobs:
 
     name: Test template install (${{ matrix.version }})
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install and check template
         run: |
@@ -102,7 +108,7 @@ jobs:
 
     name: Check that Bash completion is up to date
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: go-task/setup-task@v1
 
       - name: Build completion
