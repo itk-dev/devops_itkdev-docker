@@ -38,8 +38,6 @@ on:
 jobs:
   composer-validate:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
       - uses: actions/checkout@v6
 
@@ -52,8 +50,6 @@ jobs:
 
   composer-normalized:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
       - uses: actions/checkout@v6
 
@@ -67,8 +63,6 @@ jobs:
 
   composer-audit:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
     steps:
       - uses: actions/checkout@v6
 
