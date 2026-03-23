@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Check that Github Actions documentation is up to date
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: go-task/setup-task@v1
 
       # https://github.com/mxschmitt/action-tmate?tab=readme-ov-file#manually-triggered-debug
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Check that Github Actions template headers are up to date
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: go-task/setup-task@v1
       - run: |
           task github-actions:template-headers:update --yes
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Check that config file headers are up to date
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: go-task/setup-task@v1
       - run: |
           task github-actions:config-headers:update --yes
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Check that workflow and config file links are up to date
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: go-task/setup-task@v1
       - run: |
           task github-actions:link --yes
@@ -66,7 +66,7 @@ jobs:
   lint-markdown:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: go-task/setup-task@v1
       - run: |
           SKIP_FIX=1 task lint:markdown
@@ -74,7 +74,7 @@ jobs:
   lint-shell-script:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: go-task/setup-task@v1
       - run: |
           SKIP_FIX=1 task lint:shell-script
