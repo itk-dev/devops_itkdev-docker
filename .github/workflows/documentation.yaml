@@ -1,6 +1,13 @@
-on: pull_request
+on:
+  pull_request:
+    paths:
+      - "github/**"
+      - ".github/**"
+      - "config/**"
+      - "task/scripts/**"
+      - "docs/**"
 
-name: Review
+name: Github Actions documentation
 
 env:
   COMPOSE_USER: runner
@@ -62,19 +69,3 @@ jobs:
       # Check that files have not changed.
       - run: |
           git diff --exit-code
-
-  lint-markdown:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: go-task/setup-task@v1
-      - run: |
-          SKIP_FIX=1 task lint:markdown
-
-  lint-shell-script:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: go-task/setup-task@v1
-      - run: |
-          SKIP_FIX=1 task lint:shell-script

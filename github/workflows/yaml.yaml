@@ -25,7 +25,6 @@ on:
     paths:
       - "**/*.yml"
       - "**/*.yaml"
-      - "docker-compose.yml"
   push:
     branches:
       - main
@@ -33,7 +32,6 @@ on:
     paths:
       - "**/*.yml"
       - "**/*.yaml"
-      - "docker-compose.yml"
 
 jobs:
   yaml-lint:

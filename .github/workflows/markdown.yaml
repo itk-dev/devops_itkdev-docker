@@ -24,14 +24,16 @@ on:
   pull_request:
     paths:
       - "**/*.md"
-      - "docker-compose.yml"
+      - "compose.{yaml,yml}"
+      - "docker-compose.{yaml,yml}"
   push:
     branches:
       - main
       - develop
     paths:
       - "**/*.md"
-      - "docker-compose.yml"
+      - "compose.{yaml,yml}"
+      - "docker-compose.{yaml,yml}"
 
 jobs:
   markdown-lint:

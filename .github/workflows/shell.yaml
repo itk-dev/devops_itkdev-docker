@@ -3,7 +3,7 @@ on:
     paths:
       - "task/scripts/*"
 
-name: Workflow templates
+name: Shell
 
 jobs:
   shellcheck:
