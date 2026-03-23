@@ -22,14 +22,13 @@ name: Markdown
 
 on:
   pull_request:
-    paths:
+    paths: &paths
       - "**/*.md"
   push:
     branches:
       - main
       - develop
-    paths:
-      - "**/*.md"
+    paths: *paths
 
 jobs:
   markdown-lint:

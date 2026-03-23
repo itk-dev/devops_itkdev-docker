@@ -22,7 +22,7 @@ name: Markdown
 
 on:
   pull_request:
-    paths:
+    paths: &paths
       - "**/*.md"
       - "compose.{yaml,yml}"
       - "docker-compose.{yaml,yml}"
@@ -30,10 +30,7 @@ on:
     branches:
       - main
       - develop
-    paths:
-      - "**/*.md"
-      - "compose.{yaml,yml}"
-      - "docker-compose.{yaml,yml}"
+    paths: *paths
 
 jobs:
   markdown-lint:

@@ -15,16 +15,14 @@ name: JavaScript
 
 on:
   pull_request:
-    paths:
+    paths: &paths
       - "web/themes/custom/**/js/**/*.js"
       - "docker-compose.yml"
   push:
     branches:
       - main
       - develop
-    paths:
-      - "web/themes/custom/**/js/**/*.js"
-      - "docker-compose.yml"
+    paths: *paths
 
 jobs:
   javascript-lint:

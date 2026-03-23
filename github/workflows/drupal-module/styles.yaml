@@ -15,16 +15,14 @@ name: Styles
 
 on:
   pull_request:
-    paths:
+    paths: &paths
       - "css/**/*.css"
       - "docker-compose.yml"
   push:
     branches:
       - main
       - develop
-    paths:
-      - "css/**/*.css"
-      - "docker-compose.yml"
+    paths: *paths
 
 jobs:
   styles-lint:

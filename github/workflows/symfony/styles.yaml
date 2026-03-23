@@ -15,7 +15,7 @@ name: Styles
 
 on:
   pull_request:
-    paths:
+    paths: &paths
       - "assets/**/*.css"
       - "assets/**/*.scss"
       - "docker-compose.yml"
@@ -23,10 +23,7 @@ on:
     branches:
       - main
       - develop
-    paths:
-      - "assets/**/*.css"
-      - "assets/**/*.scss"
-      - "docker-compose.yml"
+    paths: *paths
 
 jobs:
   styles-lint:
