@@ -31,17 +31,17 @@ env:
 on:
   pull_request:
     paths:
-      - 'composer.json'
-      - 'composer.lock'
-      - 'docker-compose.yml'
+      - "composer.json"
+      - "composer.lock"
+      - "docker-compose.yml"
   push:
     branches:
       - main
       - develop
     paths:
-      - 'composer.json'
-      - 'composer.lock'
-      - 'docker-compose.yml'
+      - "composer.json"
+      - "composer.lock"
+      - "docker-compose.yml"
 
 jobs:
   composer-validate:
