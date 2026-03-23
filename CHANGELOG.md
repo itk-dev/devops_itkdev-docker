@@ -6,10 +6,6 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
-- [PR-141](https://github.com/itk-dev/devops_itkdev-docker/pull/141) - 2026-03-23 -
-  Added GitHub Action to validate changelog on PR events. Rebuilt changelog format.
-- [PR-140](https://github.com/itk-dev/devops_itkdev-docker/pull/140) - 2026-03-23 -
-  GitHub Actions maintenance
 - [PR-135](https://github.com/itk-dev/devops_itkdev-docker/pull/135) - 2026-01-29 -
   Add Podman support with dynamic machine detection
 - [PR-126](https://github.com/itk-dev/devops_itkdev-docker/pull/126) - 2026-01-05 -
@@ -27,6 +23,10 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ### 2026
 
+- [PR-141](https://github.com/itk-dev/devops_itkdev-docker/pull/141) - 2026-03-23 -
+  Added GitHub Action to validate changelog on PR events. Rebuilt changelog format.
+- [PR-140](https://github.com/itk-dev/devops_itkdev-docker/pull/140) - 2026-03-23 -
+  GitHub Actions maintenance
 - [PR-139](https://github.com/itk-dev/devops_itkdev-docker/pull/139) - 2026-03-06 -
   Added completion action
 - [PR-138](https://github.com/itk-dev/devops_itkdev-docker/pull/138) - 2026-03-06 -
