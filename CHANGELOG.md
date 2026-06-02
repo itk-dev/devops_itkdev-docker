@@ -6,6 +6,9 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-143](https://github.com/itk-dev/devops_itkdev-docker/pull/143) - 2026-06-02 -
+  Fixed `composer audit` action to audit the lock file (`--locked`) for
+  compatibility with the latest Composer
 - [PR-142](https://github.com/itk-dev/devops_itkdev-docker/pull/142) - 2026-05-21 -
   Add Prettier config for Taskfiles
 - [PR-135](https://github.com/itk-dev/devops_itkdev-docker/pull/135) - 2026-01-29 -
