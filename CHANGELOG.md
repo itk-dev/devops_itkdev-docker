@@ -6,6 +6,9 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-144](https://github.com/itk-dev/devops_itkdev-docker/pull/144) - 2026-06-10 -
+  Add `NGINX_FASTCGI_READ_TIMEOUT` support to nginx templates and document the
+  supported `NGINX_*` variables
 - [PR-143](https://github.com/itk-dev/devops_itkdev-docker/pull/143) - 2026-06-02 -
   Fixed `composer audit` action to audit the lock file (`--locked`) for
   compatibility with the latest Composer
