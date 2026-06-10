@@ -65,6 +65,8 @@ services:
       NGINX_WEB_ROOT: /app/public
       NGINX_PORT: 8080
       NGINX_MAX_BODY_SIZE: 5M
+      # Timeout for reading a response from PHP-FPM (https://nginx.org/en/docs/http/ngx_http_fastcgi_module.html#fastcgi_read_timeout)
+      NGINX_FASTCGI_READ_TIMEOUT: 60s
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=frontend"

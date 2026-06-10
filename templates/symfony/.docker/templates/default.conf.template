@@ -37,6 +37,7 @@ server {
         fastcgi_busy_buffers_size 64k;
 
         fastcgi_pass ${NGINX_FPM_SERVICE};
+        fastcgi_read_timeout ${NGINX_FASTCGI_READ_TIMEOUT};
         fastcgi_split_path_info ^(.+\.php)(/.*)$;
         include fastcgi_params;
 
