@@ -34,7 +34,7 @@ jobs:
           - symfony-8
     name: Validate compose (${{ matrix.version }})
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Validate local docker compose files
         run: |
@@ -59,7 +59,7 @@ jobs:
 
     name: Validate nginx conf (${{ matrix.version }}/${{ matrix.compose_file}})
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Create docker network
         run: |
@@ -80,7 +80,7 @@ jobs:
 
     name: Test template install (${{ matrix.version }})
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Install and check template
         run: |
@@ -108,8 +108,8 @@ jobs:
 
     name: Check that Bash completion is up to date
     steps:
-      - uses: actions/checkout@v6
-      - uses: go-task/setup-task@v1
+      - uses: actions/checkout@v7
+      - uses: go-task/setup-task@v2
 
       - name: Build completion
         run: task completion:build

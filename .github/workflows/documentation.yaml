@@ -17,8 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Check that Github Actions documentation is up to date
     steps:
-      - uses: actions/checkout@v6
-      - uses: go-task/setup-task@v1
+      - uses: actions/checkout@v7
+      - uses: go-task/setup-task@v2
 
       # https://github.com/mxschmitt/action-tmate?tab=readme-ov-file#manually-triggered-debug
       # Enable tmate debugging if debug logging is enabled (cf.
@@ -38,8 +38,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Check that Github Actions template headers are up to date
     steps:
-      - uses: actions/checkout@v6
-      - uses: go-task/setup-task@v1
+      - uses: actions/checkout@v7
+      - uses: go-task/setup-task@v2
       - run: |
           task github-actions:template-headers:update --yes
       # Check that files have not changed.
@@ -50,8 +50,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Check that config file headers are up to date
     steps:
-      - uses: actions/checkout@v6
-      - uses: go-task/setup-task@v1
+      - uses: actions/checkout@v7
+      - uses: go-task/setup-task@v2
       - run: |
           task github-actions:config-headers:update --yes
       # Check that files have not changed.
@@ -62,8 +62,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Check that workflow and config file links are up to date
     steps:
-      - uses: actions/checkout@v6
-      - uses: go-task/setup-task@v1
+      - uses: actions/checkout@v7
+      - uses: go-task/setup-task@v2
       - run: |
           task github-actions:link --yes
       # Check that files have not changed.
