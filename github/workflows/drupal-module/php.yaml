@@ -60,6 +60,9 @@ jobs:
         run: |
           docker network create frontend
 
+      - name: Pull container images
+        run: docker compose pull --quiet --include-deps phpfpm
+
       - run: |
           docker compose run --rm phpfpm composer install
           docker compose run --rm phpfpm vendor/bin/phpcs

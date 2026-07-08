@@ -6,6 +6,11 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-147](https://github.com/itk-dev/devops_itkdev-docker/pull/147) - 2026-07-08 -
+  Pull `phpfpm` and its dependencies up front
+  (`docker compose pull --quiet --include-deps phpfpm`) in the Composer, Twig
+  and PHP workflow templates so the images download in parallel before the job
+  runs
 - [PR-145](https://github.com/itk-dev/devops_itkdev-docker/pull/145) - 2026-07-08 -
   Updated GitHub Actions to latest versions (`actions/checkout` to `v7`,
   `go-task/setup-task` to `v2`) in workflow templates and repository CI
