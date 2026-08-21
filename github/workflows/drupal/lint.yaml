@@ -71,7 +71,7 @@ jobs:
           docker network create frontend
 
       - name: Check that changelog has been updated
-        if: github.event_name == 'pull_request'
+        if: "!cancelled() && github.event_name == 'pull_request'"
         run: |
           git fetch
           git diff --exit-code origin/${{ github.base_ref }} -- CHANGELOG.md && exit 1 || exit 0

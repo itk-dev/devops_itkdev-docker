@@ -7,9 +7,10 @@
 ### Validates and audits `composer.json`, checks PHP coding standards and
 ### validates Twig files.
 ###
-### One job for all of it: every check needs the project's Composer
+### One job for all of it: the checks share the project's Composer
 ### dependencies, so they are installed once. Each check runs even if an
-### earlier one fails, so a pull request reports every problem at once.
+### earlier one fails, so a pull request reports every problem at once;
+### those needing `vendor` are skipped when the install fails.
 ###
 ### `--no-deps` keeps `docker compose run` from starting the database and cache
 ### services; none of these checks touch them.
@@ -109,11 +110,13 @@ jobs:
           docker compose run --rm --no-deps phpfpm composer validate --strict
 
       - name: Install dependencies
+        id: install
+        if: "!cancelled()"
         run: |
           docker compose run --rm --no-deps phpfpm composer install
 
       - name: Check that composer.json is normalized
-        if: "!cancelled()"
+        if: "!cancelled() && steps.install.outcome == 'success'"
         run: |
           docker compose run --rm --no-deps phpfpm composer normalize --dry-run
 
@@ -123,11 +126,11 @@ jobs:
           docker compose run --rm --no-deps phpfpm composer audit --locked
 
       - name: Check coding standards
-        if: "!cancelled()"
+        if: "!cancelled() && steps.install.outcome == 'success'"
         run: |
           docker compose run --rm --no-deps phpfpm vendor/bin/php-cs-fixer fix --dry-run --diff
 
       - name: Check Twig files
-        if: "!cancelled()"
+        if: "!cancelled() && steps.install.outcome == 'success'"
         run: |
           docker compose run --rm --no-deps phpfpm vendor/bin/twig-cs-fixer lint
