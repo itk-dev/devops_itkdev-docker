@@ -7,10 +7,9 @@ project_dir=$(cd "$(dirname "$script_dir")/.." && pwd)
 
 cd "$project_dir" || exit
 
-# Configuration topics a workflow needs. A workflow file is named after what it
-# is concerned with, and its configuration lives in a folder of the same name.
-# A consolidated workflow covers more than one topic, so it needs more than one
-# configuration folder.
+# Configuration folders a workflow needs. A workflow is named after what it is
+# concerned with and its configuration lives in a folder of the same name; a
+# workflow covering several concerns needs several folders.
 function config-topics-for() {
   case "$(basename "$1" .yaml)" in
   lint)

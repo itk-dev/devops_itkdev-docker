@@ -9,10 +9,8 @@ to match the new templates.
 
 * A workflow file is named after what it is _concerned_ with, not _how_ it's concerned with it and which tools are
   actually used, i.e. we have a [`lint.yaml`](github/workflows/symfony/lint.yaml) file and not a `prettier.yaml` file.
-* A workflow covers several concerns when they share a container and a checkout: `lint.yaml` runs every check that needs
-  no project dependencies, and `php.yaml` every check that needs the project's Composer dependencies. A pull request
-  then pays for one runner job per group instead of one per tool, and a job is billed a whole minute however little it
-  does.
+* A workflow covers several concerns that share a container and a checkout, so startup costs are paid once:
+  `lint.yaml` runs the checks needing no project dependencies, `php.yaml` those needing the Composer dependencies.
 * Workflows sit in a project type subfolder, currently `drupal`, `drupal-module` or `symfony`, e.g.
   `github/workflows/drupal`.
 * Some tools require configuration files, and these sit in the `config` folder. Some tool configuration may be specific

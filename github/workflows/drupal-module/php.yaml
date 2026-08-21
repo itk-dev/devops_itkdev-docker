@@ -4,15 +4,13 @@
 
 ### ### Drupal module PHP
 ###
-### Runs every check that needs the project's PHP dependencies: validates and
-### audits `composer.json`, checks coding standards with
+### Validates and audits `composer.json`, checks coding standards with
 ### [PHP_CodeSniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer), and
 ### lints Twig files.
 ###
-### These were once four separate workflows, and therefore four runner jobs,
-### each installing the dependencies again. Here they are installed once and
-### every check reuses them. Each check still runs even if an earlier one fails
-### (`if: "!cancelled()"`), so a pull request reports all problems at once.
+### One job for all of it: every check needs the project's Composer
+### dependencies, so they are installed once. Each check runs even if an
+### earlier one fails, so a pull request reports every problem at once.
 ###
 ### `--no-deps` keeps `docker compose run` from starting the database and cache
 ### services; none of these checks touch them.

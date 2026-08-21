@@ -4,14 +4,12 @@
 
 ### ### Symfony Lint
 ###
-### Runs every check that needs no project dependencies: the changelog,
-### Markdown, YAML, styles and JavaScript.
+### Checks the changelog and lints Markdown, YAML, styles and JavaScript.
 ###
-### These were once five workflows, i.e. five runner jobs, each paying for its
-### own checkout and image pull and each billed a full minute however little it
-### did. They are one job here. Every check still runs even if an earlier one
-### fails (`if: "!cancelled()"`), so a pull request reports all problems at
-### once, as it did before.
+### One job for all of it: a job costs a checkout, an image pull and a minimum
+### of one billed minute, and none of these checks need the project's
+### dependencies. Each check runs even if an earlier one fails, so a pull
+### request reports every problem at once.
 ###
 ### #### Assumptions
 ###
