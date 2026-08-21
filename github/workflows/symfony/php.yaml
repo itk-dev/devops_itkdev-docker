@@ -4,34 +4,41 @@
 
 ### ### Symfony PHP
 ###
-### Checks that PHP code adheres to the [Symfony coding
-### standards](https://symfony.com/doc/current/contributing/code/standards.html).
+### Runs every check that needs the project's PHP dependencies: validates and
+### audits `composer.json`, checks coding standards with
+### [PHP-CS-Fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer), and
+### lints Twig files.
+###
+### These were once four separate workflows, and therefore four runner jobs,
+### each installing the dependencies again. Here they are installed once and
+### every check reuses them. Each check still runs even if an earlier one fails
+### (`if: "!cancelled()"`), so a pull request reports all problems at once.
+###
+### `--no-deps` keeps `docker compose run` from starting the database and cache
+### services; none of these checks touch them.
 ###
 ### #### Assumptions
 ###
 ### 1. A docker compose service named `phpfpm` can be run and `composer` can be
-###    run inside the `phpfpm` service. 2.
-###    [friendsofphp/php-cs-fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer)
-###    is a dev requirement in `composer.json`:
+###    run inside the `phpfpm` service.
+### 2. These dev requirements are in `composer.json`:
 ###
 ###    ``` shell
-###    docker compose run --rm phpfpm composer require --dev friendsofphp/php-cs-fixer
+###    docker compose run --rm --no-deps phpfpm composer require --dev ergebnis/composer-normalize
+###    docker compose run --rm --no-deps phpfpm composer require --dev friendsofphp/php-cs-fixer
+###    docker compose run --rm --no-deps phpfpm composer require --dev vincentlanglet/twig-cs-fixer
 ###    ```
 ###
-###    Clean up and check code by running
+###    Normalize `composer.json` by running
 ###
 ###    ``` shell
-###    docker compose run --rm phpfpm vendor/bin/php-cs-fixer fix
-###    docker compose run --rm phpfpm vendor/bin/php-cs-fixer fix --dry-run --diff
+###    docker compose run --rm --no-deps phpfpm composer normalize
 ###    ```
 ###
-### > [!NOTE] The template adds `.php-cs-fixer.dist.php` as [a configuration
-### > file for PHP CS
-### > Fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/blob/master/doc/config.rst)
-### > and this makes it possible to override the actual configuration used in a
-### > project by adding a more important configuration file, `.php-cs-fixer.php`.
+### 3. Configuration files in the root of the project define which files to
+###    check and which rules to use.
 
-name: Symfony PHP
+name: PHP
 
 env:
   COMPOSE_USER: runner
@@ -40,6 +47,7 @@ on:
   pull_request:
     paths: &paths
       - "**/*.php"
+      - "**/*.twig"
       - "composer.json"
       - "composer.lock"
       - "docker-compose.yml"
@@ -50,17 +58,47 @@ on:
     paths: *paths
 
 jobs:
-  coding-standards:
-    name: PHP - Check Coding Standards
+  php:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout
+        uses: actions/checkout@v7
 
       - name: Create docker network
         run: |
           docker network create frontend
 
-      - run: |
-          docker compose run --rm phpfpm composer install
-          # https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/blob/master/doc/usage.rst#the-check-command
-          docker compose run --rm phpfpm vendor/bin/php-cs-fixer fix --dry-run --diff
+      - name: Cache Composer dependencies
+        uses: actions/cache@v6
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock', 'docker-compose.yml') }}
+          restore-keys: composer-
+
+      - name: Validate composer.json
+        run: |
+          docker compose run --rm --no-deps phpfpm composer validate --strict
+
+      - name: Install dependencies
+        run: |
+          docker compose run --rm --no-deps phpfpm composer install
+
+      - name: Check that composer.json is normalized
+        if: "!cancelled()"
+        run: |
+          docker compose run --rm --no-deps phpfpm composer normalize --dry-run
+
+      - name: Audit dependencies
+        if: "!cancelled()"
+        run: |
+          docker compose run --rm --no-deps phpfpm composer audit --locked
+
+      - name: Check coding standards
+        if: "!cancelled()"
+        run: |
+          docker compose run --rm --no-deps phpfpm vendor/bin/php-cs-fixer fix --dry-run --diff
+
+      - name: Check Twig files
+        if: "!cancelled()"
+        run: |
+          docker compose run --rm --no-deps phpfpm vendor/bin/twig-cs-fixer lint
