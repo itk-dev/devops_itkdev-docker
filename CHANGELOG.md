@@ -6,6 +6,12 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-148](https://github.com/itk-dev/devops_itkdev-docker/pull/148) - 2026-08-21 -
+  Consolidated the workflow templates into `<type>/lint.yaml` (changelog,
+  Markdown, YAML, styles, JavaScript) and `<type>/php.yaml` (Composer, coding
+  standards, Twig), so a commit pays for two runner jobs instead of up to
+  eleven. All `docker compose run` calls use `--no-deps` and the `vendor`
+  directory is cached
 - [PR-145](https://github.com/itk-dev/devops_itkdev-docker/pull/145) - 2026-07-08 -
   Updated GitHub Actions to latest versions (`actions/checkout` to `v7`,
   `go-task/setup-task` to `v2`) in workflow templates and repository CI
