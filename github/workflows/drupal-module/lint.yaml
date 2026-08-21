@@ -13,14 +13,37 @@
 ###
 ### #### Assumptions
 ###
-### 1. Docker compose services named `markdownlint` and `prettier` exist.
-### 2. [markdownlint-cli configuration
-###    files](https://github.com/igorshubovych/markdownlint-cli?tab=readme-ov-file#configuration),
-###    `.markdownlint.jsonc` and `.markdownlintignore`, control what is
-###    actually linted and how.
-### 3. A [Prettier configuration file](https://prettier.io/docs/configuration),
-###    `.prettierrc.yaml`, makes Prettier format YAML files the way the
-###    framework expects.
+### 1. A docker compose service named `markdownlint` for running `markdownlint`
+###    (from
+###    [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli))
+###    exists.
+### 2. A docker compose service named `prettier` for running
+###    [Prettier](https://prettier.io/) exists.
+###
+### #### Changelog
+###
+### Checks that changelog has been updated.
+###
+### #### Markdown
+###
+### Lints Markdown files (`**/*.md`) in the project.
+###
+### [markdownlint-cli configuration
+### files](https://github.com/igorshubovych/markdownlint-cli?tab=readme-ov-file#configuration),
+### `.markdownlint.jsonc` and `.markdownlintignore`, control what is actually
+### linted and how.
+###
+### #### YAML
+###
+### Validates YAML files.
+###
+### #### Styles (CSS and SCSS)
+###
+### Validates styles files (`css/**/*.css`).
+###
+### #### JavaScript (and TypeScript)
+###
+### Validates JavaScript files (`js/**/*.js`).
 
 name: Lint
 

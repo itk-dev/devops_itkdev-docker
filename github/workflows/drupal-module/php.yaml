@@ -4,9 +4,8 @@
 
 ### ### Drupal module PHP
 ###
-### Validates and audits `composer.json`, checks coding standards with
-### [PHP_CodeSniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer), and
-### lints Twig files.
+### Validates and audits `composer.json`, checks PHP coding standards and
+### validates Twig files.
 ###
 ### One job for all of it: every check needs the project's Composer
 ### dependencies, so they are installed once. Each check runs even if an
@@ -19,7 +18,10 @@
 ###
 ### 1. A docker compose service named `phpfpm` can be run and `composer` can be
 ###    run inside the `phpfpm` service.
-### 2. These dev requirements are in `composer.json`:
+### 2. [ergebnis/composer-normalize](https://github.com/ergebnis/composer-normalize),
+###    [drupal/coder](https://www.drupal.org/project/coder) and
+###    [vincentlanglet/twig-cs-fixer](https://github.com/VincentLanglet/Twig-CS-Fixer)
+###    are dev requirements in `composer.json`:
 ###
 ###    ``` shell
 ###    docker compose run --rm --no-deps phpfpm composer require --dev ergebnis/composer-normalize
@@ -27,14 +29,42 @@
 ###    docker compose run --rm --no-deps phpfpm composer require --dev vincentlanglet/twig-cs-fixer
 ###    ```
 ###
-###    Normalize `composer.json` by running
+### #### Composer
 ###
-###    ``` shell
-###    docker compose run --rm --no-deps phpfpm composer normalize
-###    ```
+### Validates `composer.json`, checks that it is normalized and audits
+### `composer.lock` for known vulnerabilities.
 ###
-### 3. Configuration files in the root of the project define which files to
-###    check and which rules to use.
+### Normalize `composer.json` by running
+###
+### ``` shell
+### docker compose run --rm --no-deps phpfpm composer normalize
+### ```
+###
+### #### Coding standards
+###
+### Checks that PHP code adheres to the [Drupal coding
+### standards](https://www.drupal.org/docs/develop/standards).
+###
+### Clean up and check code by running
+###
+### ``` shell
+### docker compose run --rm --no-deps phpfpm vendor/bin/phpcbf
+### docker compose run --rm --no-deps phpfpm vendor/bin/phpcs
+### ```
+###
+### > [!NOTE]
+### > The template adds `.phpcs.xml.dist` as [a configuration file for
+### > PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer/wiki/Advanced-Usage#using-a-default-configuration-file)
+### > and this makes it possible to override the actual configuration used in a
+### > project by adding a more important configuration file, e.g. `.phpcs.xml`.
+###
+### #### Twig
+###
+### Validates Twig files.
+###
+### A [Configuration
+### file](https://github.com/VincentLanglet/Twig-CS-Fixer/blob/main/docs/configuration.md#configuration-file)
+### in the root of the project defines which files to check and rules to use.
 
 name: PHP
 
