@@ -51,11 +51,19 @@
 name: Lint
 
 on:
+  # No path filter on pull requests: the changelog check must run on every one.
   pull_request:
   push:
     branches:
       - main
       - develop
+    paths:
+      - "**/*.md"
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "web/themes/custom/**/css/**/*.css"
+      - "web/themes/custom/**/css/**/*.scss"
+      - "web/themes/custom/**/js/**/*.js"
 
 jobs:
   lint:
