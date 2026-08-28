@@ -31,6 +31,8 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ### 2026
 
+- [PR-149](https://github.com/itk-dev/devops_itkdev-docker/pull/149) - 2026-08-28 -
+  Upgrade traefik to 3.7
 - [PR-141](https://github.com/itk-dev/devops_itkdev-docker/pull/141) - 2026-03-23 -
   Added GitHub Action to validate changelog on PR events. Rebuilt changelog format.
 - [PR-140](https://github.com/itk-dev/devops_itkdev-docker/pull/140) - 2026-03-23 -
