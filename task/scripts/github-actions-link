@@ -7,6 +7,23 @@ project_dir=$(cd "$(dirname "$script_dir")/.." && pwd)
 
 cd "$project_dir" || exit
 
+# Configuration folders a workflow needs. A workflow is named after what it is
+# concerned with and its configuration lives in a folder of the same name; a
+# workflow covering several concerns needs several folders.
+function config-topics-for() {
+  case "$(basename "$1" .yaml)" in
+  lint)
+    printf 'markdown\nyaml\n'
+    ;;
+  php)
+    printf 'php\ntwig\n'
+    ;;
+  *)
+    basename "$1" .yaml
+    ;;
+  esac
+}
+
 # String type (drupal or symfony) from start of name
 function strip-project-type() {
   name=$1
@@ -61,25 +78,23 @@ for template_dir in templates/*; do
       mkdir -p "$target_dir"
       ln -sf "../../../../github/workflows/$source_file_name" "$target_dir/$(strip-project-type "$source_file_name")"
 
-      # Check if we need a language configuration as well
-      language_name=${source_file_name%.yaml}
-      config_dir=""
-      # Check for project_type specific configuration first.
-      if [ -d "config/$project_type/$language_name" ]; then
-        config_dir="config/$project_type/$language_name"
-      elif [ -d "config/$language_name" ]; then
-        config_dir="config/$language_name"
-      fi
-
-      if [[ -n "$config_dir" ]]; then
-        # Some config files are hidden
-        GLOBIGNORE=".:.."
-        for config_file in "$config_dir"/*; do
-          if [ -f "$config_file" ]; then
-            ln -sf "../../$config_file" "$template_dir/"
+      # Link the tool configuration each of the workflow's topics needs. The
+      # generic folder is linked first so a project type specific one of the
+      # same name wins.
+      for topic in $(config-topics-for "$source_file_name"); do
+        for config_dir in "config/$topic" "config/$project_type/$topic"; do
+          if [ ! -d "$config_dir" ]; then
+            continue
           fi
+          # Some config files are hidden
+          GLOBIGNORE=".:.."
+          for config_file in "$config_dir"/*; do
+            if [ -f "$config_file" ]; then
+              ln -sf "../../$config_file" "$template_dir/"
+            fi
+          done
         done
-      fi
+      done
     fi
   done
 

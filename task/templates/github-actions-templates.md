@@ -8,13 +8,17 @@ to match the new templates.
 ## Naming conventions
 
 * A workflow file is named after what it is _concerned_ with, not _how_ it's concerned with it and which tools are
-  actually used, i.e. we have a [`markdown.yaml`](github/workflows/markdown.yaml) file and not a `markdownlint.yaml`
-  file.
-* Some workflows are specific to a project type, currently `drupal` or `symfony`, and these sit in a project type
-  subfolder, e.g. `github/workflows/drupal`.
+  actually used, i.e. we have a [`lint.yaml`](github/workflows/symfony/lint.yaml) file and not a `prettier.yaml` file.
+* A workflow covers several concerns that share a container and a checkout, so startup costs are paid once:
+  `lint.yaml` runs the checks needing no project dependencies, `php.yaml` those needing the Composer dependencies.
+* Workflows sit in a project type subfolder, currently `drupal`, `drupal-module` or `symfony`, e.g.
+  `github/workflows/drupal`.
 * Some tools require configuration files, and these sit in the `config` folder. Some tool configuration may be specific
   to a project type (or make sence only for a specific project type), and these specific config files sit in a project
   type subfolder, e.g. `config/drupal/php/.phpcs.xml.dist` and `config/drupal/twig/.twig-cs-fixer.dist.php`
+* A workflow covering several concerns needs the configuration of each of them. `config-topics-for` in
+  [`task/scripts/github-actions-link`](task/scripts/github-actions-link) maps a workflow name to its configuration
+  folders, e.g. `php.yaml` to both `php` and `twig`.
 
 ## Templates
 
