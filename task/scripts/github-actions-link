@@ -36,6 +36,21 @@ for template_dir in templates/*; do
     exit 1
   fi
 
+  # General config files.
+  # We first check for files on the config folder and then we check for project
+  # specific files (in effect letting projects override the general config
+  # files).
+  for config_dir in config "config/$project_type"; do
+    echo "$config_dir"
+    # Some config files are hidden
+    GLOBIGNORE=".:.."
+    for config_file in "$config_dir"/*; do
+      if [ -f "$config_file" ]; then
+            ln -sf "../../$config_file" "$template_dir/"
+      fi
+    done
+  done
+
   for f in $(find github/workflows/ -name '*.yaml' | sort); do
     source_file_name=''
     # Note: / is NOT a regex delimiter here, but an actual /, i.e. a directory separator.
