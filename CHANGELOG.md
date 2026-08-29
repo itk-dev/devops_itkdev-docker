@@ -6,6 +6,11 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-146](https://github.com/itk-dev/devops_itkdev-docker/pull/146) - 2026-07-08 -
+  Cache Composer dependencies (`vendor`) in the Composer, Twig and PHP workflow
+  templates to speed up installs and avoid package registry rate limits. The
+  cache key hashes both `composer.lock` and `docker-compose.yml` so a PHP image
+  bump invalidates the cache
 - [PR-145](https://github.com/itk-dev/devops_itkdev-docker/pull/145) - 2026-07-08 -
   Updated GitHub Actions to latest versions (`actions/checkout` to `v7`,
   `go-task/setup-task` to `v2`) in workflow templates and repository CI
