@@ -8,14 +8,18 @@ networks:
 
 services:
   socket-proxy:
-    image: itkdev/docker-socket-proxy
-    user: root
+    image: ghcr.io/tecnativa/docker-socket-proxy:latest
     container_name: socket-proxy
     restart: unless-stopped
+    profiles:
+      - docker
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${CONTAINER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock:ro
     environment:
       CONTAINERS: 1
+      NETWORKS: 1
+      SERVICES: 1
+      TASKS: 1
     networks:
       - proxy
 
@@ -33,7 +37,7 @@ services:
       - "8080:8080"
       - "443:443"
     volumes:
-      - $PWD/traefik.yml:/traefik.yml:ro
+      - $PWD/${TRAEFIK_CONFIG:-traefik.yml}:/traefik.yml:ro
       - $PWD/dynamic-conf.yaml:/config/dynamic-conf.yaml:ro
       - $PWD/ssl:/certs:ro
     labels:
