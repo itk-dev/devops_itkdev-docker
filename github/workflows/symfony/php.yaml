@@ -60,6 +60,9 @@ jobs:
         run: |
           docker network create frontend
 
+      - name: Pull container images
+        run: docker compose pull --quiet --include-deps phpfpm
+
       - run: |
           docker compose run --rm phpfpm composer install
           # https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/blob/master/doc/usage.rst#the-check-command

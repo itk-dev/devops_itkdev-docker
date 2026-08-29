@@ -50,6 +50,9 @@ jobs:
         run: |
           docker network create frontend
 
+      - name: Pull container images
+        run: docker compose pull --quiet --include-deps phpfpm
+
       - run: |
           docker compose run --rm phpfpm composer validate --strict
 
@@ -61,6 +64,9 @@ jobs:
       - name: Create docker network
         run: |
           docker network create frontend
+
+      - name: Pull container images
+        run: docker compose pull --quiet --include-deps phpfpm
 
       - run: |
           docker compose run --rm phpfpm composer install
@@ -74,6 +80,9 @@ jobs:
       - name: Create docker network
         run: |
           docker network create frontend
+
+      - name: Pull container images
+        run: docker compose pull --quiet --include-deps phpfpm
 
       - run: |
           docker compose run --rm phpfpm composer audit --locked
