@@ -6,6 +6,8 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-150](https://github.com/itk-dev/devops_itkdev-docker/pull/150) - 2026-09-10 -
+  Told Prettier to ignore EditorConfig files
 - [PR-145](https://github.com/itk-dev/devops_itkdev-docker/pull/145) - 2026-07-08 -
   Updated GitHub Actions to latest versions (`actions/checkout` to `v7`,
   `go-task/setup-task` to `v2`) in workflow templates and repository CI
