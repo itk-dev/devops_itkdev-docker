@@ -6,6 +6,9 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-152](https://github.com/itk-dev/devops_itkdev-docker/pull/152) - 2026-09-15 -
+  Fixed `idc url` returning a malformed URL when a project has more than
+  one Traefik router, which left `idc open` on a blank tab
 - [PR-145](https://github.com/itk-dev/devops_itkdev-docker/pull/145) - 2026-07-08 -
   Updated GitHub Actions to latest versions (`actions/checkout` to `v7`,
   `go-task/setup-task` to `v2`) in workflow templates and repository CI
