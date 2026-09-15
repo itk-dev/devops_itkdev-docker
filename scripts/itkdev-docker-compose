@@ -597,7 +597,7 @@ case "$cmd" in
       # Get traefik host from label
       # https://stedolan.github.io/jq/manual/#test(val),test(regex;flags)
       # https://stedolan.github.io/jq/manual/#capture(val),capture(regex;flags)
-      traefik_host=$(docker inspect --format '{{ json .Config.Labels }}' $(docker_compose ps -q $service) | jq --raw-output '. | [to_entries[] | select(.key | test("^traefik\\.http\\.routers\\..+\\.rule$")) | select(.value | test("^Host\\(`(?<host>.+)`\\)$"))] | first | .value//"" | capture("^Host\\(`(?<host>.+)`\\)$") | .host//""')
+      traefik_host=$(docker inspect --format '{{ json .Config.Labels }}' $(docker_compose ps -q $service) | jq --raw-output '. | [to_entries[] | select(.key | test("^traefik\\.http\\.routers\\..+\\.rule$")) | select(.value | test("^Host\\(`[^`]+`\\)$"))] | first | .value//"" | capture("^Host\\(`(?<host>[^`]+)`\\)$") | .host//""')
     fi
 
     if ! [ -z "$traefik_host" ]; then
