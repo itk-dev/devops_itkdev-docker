@@ -7,6 +7,7 @@ These workflows are installed by `itkdev-docker-compose template:install python`
 | Workflow         | Checks                                                              |
 |------------------|---------------------------------------------------------------------|
 | `changelog.yaml` | `CHANGELOG.md` has been updated in the pull request                 |
+| `markdown.yaml`  | Markdown files pass `markdownlint` (`.markdownlint.jsonc`)          |
 | `lint.yml`       | Lint and format with `ruff`, types with `basedpyright`              |
 | `tests.yml`      | `uv.lock` is up to date (`uv lock --check`) and `pytest --cov` runs |
 | `yaml.yaml`      | YAML files are formatted with Prettier                              |
