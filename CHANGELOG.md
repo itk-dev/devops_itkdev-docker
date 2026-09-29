@@ -6,6 +6,8 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-153](https://github.com/itk-dev/devops_itkdev-docker/pull/153) - 2026-09-29
+  Added basic template for python base projects
 - [PR-152](https://github.com/itk-dev/devops_itkdev-docker/pull/152) - 2026-09-15 -
   Fixed `idc url` returning a malformed URL when a project has more than
   one Traefik router, which left `idc open` on a blank tab
