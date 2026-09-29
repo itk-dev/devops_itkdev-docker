@@ -115,13 +115,19 @@ This setup comes with self-signed wildcard certificates for *.local.itkdev.dk, b
 by using this openssl command on Mac, just change the two places where the domain is written.
 
 ```sh
-openssl req -x509 -sha256 -nodes -days 3650 -newkey rsa:2048 -keyout docker.key -out docker.crt -subj "/CN=*.local.itkdev.dk" -reqexts SAN -extensions SAN -config <(cat /usr/local/etc/openssl/openssl.cnf <(printf '[SAN]\nsubjectAltName=DNS:*.local.itkdev.dk'))
+openssl req -x509 -sha256 -nodes -days 3650 -newkey rsa:2048 -keyout docker.key -out docker.crt -subj "/CN=*.local.itkdev.dk" -reqexts SAN -extensions SAN -config <(cat "$(openssl version -d | cut -d'"' -f2)/openssl.cnf" <(printf '[SAN]\nsubjectAltName=DNS:*.local.itkdev.dk'))
 ```
+
+`openssl version -d` finds the config wherever Homebrew put it, on Intel (`/usr/local`) as well as Apple Silicon
+(`/opt/homebrew`).
+
+The wildcard covers one level only, so `foo.local.itkdev.dk` matches but `foo.bar.local.itkdev.dk` does not. Add a
+`DNS:` entry per level you need; a double wildcard, `*.*.local.itkdev.dk`, matches nothing at all.
 
 To mac browser trust this certificate you need to open it with key-chain right click and select "Get info" and then open
 the "Trust" tab and select "Always trust".
 
-The certificate is located in `./treafik/ssl/docker.crt` in this repository.
+The certificate is located in `./traefik/ssl/docker.crt` in this repository.
 
 ## Completions
 

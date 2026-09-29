@@ -9,6 +9,12 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 - [PR-152](https://github.com/itk-dev/devops_itkdev-docker/pull/152) - 2026-09-15 -
   Fixed `idc url` returning a malformed URL when a project has more than
   one Traefik router, which left `idc open` on a blank tab
+- [PR-151](https://github.com/itk-dev/devops_itkdev-docker/pull/151) - 2026-09-14 -
+  Fixed the SSL section of the README: the certificate path read `treafik`,
+  and the `openssl` config path was the Intel Homebrew prefix, so the
+  documented command failed on Apple Silicon
+- [PR-150](https://github.com/itk-dev/devops_itkdev-docker/pull/150) - 2026-09-10 -
+  Told Prettier to ignore EditorConfig files
 - [PR-145](https://github.com/itk-dev/devops_itkdev-docker/pull/145) - 2026-07-08 -
   Updated GitHub Actions to latest versions (`actions/checkout` to `v7`,
   `go-task/setup-task` to `v2`) in workflow templates and repository CI
