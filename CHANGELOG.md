@@ -6,6 +6,9 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-152](https://github.com/itk-dev/devops_itkdev-docker/pull/152) - 2026-09-15 -
+  Fixed `idc url` returning a malformed URL when a project has more than
+  one Traefik router, which left `idc open` on a blank tab
 - [PR-151](https://github.com/itk-dev/devops_itkdev-docker/pull/151) - 2026-09-14 -
   Fixed the SSL section of the README: the certificate path read `treafik`,
   and the `openssl` config path was the Intel Homebrew prefix, so the
