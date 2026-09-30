@@ -31,6 +31,9 @@ for template_dir in templates/*; do
     project_type="drupal"
   elif [[ "$template_name" =~ ^symfony(-|$) ]]; then
     project_type="symfony"
+  elif [[ "$template_name" == "python" ]]; then
+    # The python template has its own workflow files; nothing to link.
+    continue
   else
     (>&2 echo "Unknown template type: $template_name")
     exit 1
