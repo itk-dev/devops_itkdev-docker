@@ -21,8 +21,24 @@ reading `docker-compose.yml` (`docker compose config`) and picking every service
 services:
   api:
     labels:
-      dk.itkdev.python: "true"
+      dk.itkdev.language: python
 ```
+
+The label names the language whose checks run in the service, not how the service runs (e.g. `uvicorn` or a CLI),
+so templates for other languages can select their services the same way (`dk.itkdev.language: php`).
+
+How the service runs could later get a label of its own, `dk.itkdev.runtime`, once a template or tool needs to tell
+runtimes apart, e.g. `php-fpm` and `frankenphp` for PHP, or `uvicorn` and `cli` for Python:
+
+```yaml
+services:
+  app:
+    labels:
+      dk.itkdev.language: php
+      dk.itkdev.runtime: frankenphp
+```
+
+Nothing reads `dk.itkdev.runtime` yet.
 
 Every job runs once per service, and each service shows up as its own check, e.g. `Tests (api)`. If no service
 has the label, the workflows fail.
@@ -49,7 +65,7 @@ The value must be valid JSON (double quotes). The variable lives in GitHub, not 
 1. `.env.example` exists and contains every variable `docker-compose.yml` requires. The workflows copy it to `.env`.
 2. `docker-compose.yml` uses `APP_UID`/`APP_GID` for the container user and an external network named `frontend`;
    both are set up by the workflows.
-3. Each Python service (labelled, or listed in `PYTHON_SERVICES`) can run with `--no-deps` and has `uv`, `pytest` with
+3. Each Python service (labeled, or listed in `PYTHON_SERVICES`) can run with `--no-deps` and has `uv`, `pytest` with
    [pytest-cov](https://pytest-cov.readthedocs.io/), `ruff` and `basedpyright` available.
 4. Coverage is configured in `pyproject.toml` (`[tool.coverage.run] source = [...]`), since the workflow runs
    plain `pytest --cov`.

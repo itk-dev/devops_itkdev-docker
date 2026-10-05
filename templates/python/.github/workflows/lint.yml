@@ -1,6 +1,6 @@
 name: Python linting
 
-# Checks run in every docker compose service labelled dk.itkdev.python=true.
+# Checks run in every docker compose service labeled dk.itkdev.language=python.
 # The repository variable PYTHON_SERVICES (JSON list, e.g. ["api", "worker"])
 # overrides this.
 
@@ -34,8 +34,8 @@ jobs:
       - id: find
         run: |
           list=$(docker compose config --format json \
-            | jq -c '[.services | to_entries[] | select(.value.labels["dk.itkdev.python"] == "true") | .key]')
-          [ "$list" != "[]" ] || { echo "::error::No service has the label dk.itkdev.python=true"; exit 1; }
+            | jq -c '[.services | to_entries[] | select(.value.labels["dk.itkdev.language"] == "python") | .key]')
+          [ "$list" != "[]" ] || { echo "::error::No service has the label dk.itkdev.language=python"; exit 1; }
           echo "list=$list" >> "$GITHUB_OUTPUT"
 
   lint:
