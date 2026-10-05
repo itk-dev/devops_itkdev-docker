@@ -9,6 +9,9 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 - [PR-155](https://github.com/itk-dev/devops_itkdev-docker/pull/155) - 2026-10-05 -
   Python template: select the services to lint and test by the label
   `dk.itkdev.language: python` instead of `dk.itkdev.python: "true"`
+- [PR-154](https://github.com/itk-dev/devops_itkdev-docker/pull/154) - 2026-10-05 -
+  Pass `github.base_ref` to the changelog workflow through `env` instead of
+  interpolating it into the shell command
 - [PR-153](https://github.com/itk-dev/devops_itkdev-docker/pull/153) - 2026-09-29 -
   Added basic template for python base projects
 - [PR-152](https://github.com/itk-dev/devops_itkdev-docker/pull/152) - 2026-09-15 -
