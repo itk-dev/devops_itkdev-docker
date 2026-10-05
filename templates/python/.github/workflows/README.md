@@ -65,7 +65,7 @@ The value must be valid JSON (double quotes). The variable lives in GitHub, not 
 1. `.env.example` exists and contains every variable `docker-compose.yml` requires. The workflows copy it to `.env`.
 2. `docker-compose.yml` uses `APP_UID`/`APP_GID` for the container user and an external network named `frontend`;
    both are set up by the workflows.
-3. Each Python service (labelled, or listed in `PYTHON_SERVICES`) can run with `--no-deps` and has `uv`, `pytest` with
+3. Each Python service (labeled, or listed in `PYTHON_SERVICES`) can run with `--no-deps` and has `uv`, `pytest` with
    [pytest-cov](https://pytest-cov.readthedocs.io/), `ruff` and `basedpyright` available.
 4. Coverage is configured in `pyproject.toml` (`[tool.coverage.run] source = [...]`), since the workflow runs
    plain `pytest --cov`.

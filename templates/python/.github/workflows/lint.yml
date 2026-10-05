@@ -1,6 +1,6 @@
 name: Python linting
 
-# Checks run in every docker compose service labelled dk.itkdev.language=python.
+# Checks run in every docker compose service labeled dk.itkdev.language=python.
 # The repository variable PYTHON_SERVICES (JSON list, e.g. ["api", "worker"])
 # overrides this.
 
