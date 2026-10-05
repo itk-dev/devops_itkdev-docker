@@ -21,8 +21,11 @@ reading `docker-compose.yml` (`docker compose config`) and picking every service
 services:
   api:
     labels:
-      dk.itkdev.python: "true"
+      dk.itkdev.language: python
 ```
+
+The label names the language whose checks run in the service, not how the service runs (e.g. `uvicorn` or a CLI),
+so templates for other languages can select their services the same way (`dk.itkdev.language: php`).
 
 Every job runs once per service, and each service shows up as its own check, e.g. `Tests (api)`. If no service
 has the label, the workflows fail.
