@@ -27,6 +27,19 @@ services:
 The label names the language whose checks run in the service, not how the service runs (e.g. `uvicorn` or a CLI),
 so templates for other languages can select their services the same way (`dk.itkdev.language: php`).
 
+How the service runs could later get a label of its own, `dk.itkdev.runtime`, once a template or tool needs to tell
+runtimes apart, e.g. `php-fpm` and `frankenphp` for PHP, or `uvicorn` and `cli` for Python:
+
+```yaml
+services:
+  app:
+    labels:
+      dk.itkdev.language: php
+      dk.itkdev.runtime: frankenphp
+```
+
+Nothing reads `dk.itkdev.runtime` yet.
+
 Every job runs once per service, and each service shows up as its own check, e.g. `Tests (api)`. If no service
 has the label, the workflows fail.
 
