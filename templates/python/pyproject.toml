@@ -7,7 +7,9 @@ dependencies = [
     "uvicorn[standard]>=0.30.0",
 ]
 
-[project.optional-dependencies]
+# A dependency group, not an optional extra: `uv sync` installs the `dev` group by
+# default (and `--no-dev` skips it), but installs extras only with `--extra`.
+[dependency-groups]
 dev = [
     "ruff>=0.9.0",
     "pytest>=8.0",
