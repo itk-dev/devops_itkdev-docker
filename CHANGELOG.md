@@ -6,7 +6,7 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
-- [PR-XXX](https://github.com/itk-dev/devops_itkdev-docker/pull/XXX) - 2026-10-08 -
+- [PR-156](https://github.com/itk-dev/devops_itkdev-docker/pull/156) - 2026-10-08 -
   Python template: install dev tools as a `[dependency-groups]` group so
   `uv sync` picks them up, and keep the venv in `/opt/venv` on `PATH` so the
   `./:/app` bind mount does not hide it
