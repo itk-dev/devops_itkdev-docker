@@ -6,6 +6,10 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-156](https://github.com/itk-dev/devops_itkdev-docker/pull/156) - 2026-10-08 -
+  Python template: install dev tools as a `[dependency-groups]` group so
+  `uv sync` picks them up, and keep the venv in `/opt/venv` on `PATH` so the
+  `./:/app` bind mount does not hide it
 - [PR-155](https://github.com/itk-dev/devops_itkdev-docker/pull/155) - 2026-10-05 -
   Python template: select the services to lint and test by the label
   `dk.itkdev.language: python` instead of `dk.itkdev.python: "true"`

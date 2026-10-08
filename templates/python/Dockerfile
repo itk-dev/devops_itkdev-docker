@@ -11,8 +11,13 @@ FROM python:3.12-slim-bookworm AS base
 # with pip; this project keeps uv because it has a uv.lock.
 COPY --from=ghcr.io/astral-sh/uv:0.12.8 /uv /uvx /bin/
 
+# The venv lives outside /app so the docker compose bind mount of ./:/app does
+# not hide it, and its bin directory is on PATH so the workflows can call
+# `pytest`, `ruff` and `basedpyright` directly.
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    UV_PROJECT_ENVIRONMENT=/opt/venv \
+    PATH="/opt/venv/bin:$PATH"
 
 # Non-root user matching the k8s securityContext (runAsUser/runAsGroup: 1000).
 RUN groupadd --gid 1000 app \
@@ -23,11 +28,12 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-RUN chown app:app /app
+RUN mkdir /opt/venv \
+ && chown app:app /app /opt/venv
 
 USER app
 
-# Copy project files as the app user so /app/.venv (created by `uv sync` below)
+# Copy project files as the app user so /opt/venv (created by `uv sync` below)
 # is owned by UID 1000 from the start.
 COPY --chown=app:app pyproject.toml uv.lock ./
 COPY --chown=app:app src/ ./src/
