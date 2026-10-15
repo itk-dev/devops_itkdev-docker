@@ -6,6 +6,11 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-157](https://github.com/itk-dev/devops_itkdev-docker/pull/157) - 2026-10-15 -
+  Traefik reads local dynamic config, such as Agent Proxy services and their
+  API keys, from the untracked `traefik/dynamic.d/`, so it can no longer be
+  committed with the shared `traefik/dynamic-conf.yaml`. Move services you
+  added to `dynamic-conf.yaml` into `dynamic.d/`, and run `traefik:start`
 - [PR-155](https://github.com/itk-dev/devops_itkdev-docker/pull/155) - 2026-10-05 -
   Python template: select the services to lint and test by the label
   `dk.itkdev.language: python` instead of `dk.itkdev.python: "true"`
