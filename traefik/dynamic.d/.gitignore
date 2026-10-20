@@ -1,0 +1,6 @@
+# Local Traefik dynamic configuration, e.g. services written by Agent Proxy.
+# Files here can hold API keys, so nothing in this directory is committed
+# except this file and the mount point for ../dynamic-conf.yaml.
+*
+!.gitignore
+!dynamic-conf.yaml
