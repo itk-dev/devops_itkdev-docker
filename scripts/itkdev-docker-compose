@@ -123,6 +123,11 @@ function template_install {
   # https://linux.die.net/man/1/rsync#:~:text=%2DL%2C-,%2D%2Dcopy%2Dlinks,-When%20symlinks%20are)
   rsync --archive --copy-links "$source_dir" "$target_dir"
 
+  # We don't make .env files for drupal modules
+  if [[ "$name" =~ ^drupal-module ]]; then
+    exit
+  fi
+
   local project_name_default=$(basename $target_dir)
 
   # Help user set up a .env file
