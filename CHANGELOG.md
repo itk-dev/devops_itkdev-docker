@@ -6,6 +6,9 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-159](https://github.com/itk-dev/devops_itkdev-docker/pull/159) - 2026-10-26 -
+  Switched the Drupal and Symfony templates to `nginx/nginx-unprivileged`,
+  as `nginxinc/nginx-unprivileged` is no longer maintained
 - [PR-157](https://github.com/itk-dev/devops_itkdev-docker/pull/157) - 2026-10-15 -
   Traefik reads local dynamic config, such as Agent Proxy services and their
   API keys, from the untracked `traefik/dynamic.d/`, so it can no longer be
