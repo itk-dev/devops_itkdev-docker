@@ -6,6 +6,10 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-160](https://github.com/itk-dev/devops_itkdev-docker/pull/160) - 2026-10-28 -
+  Drupal site workflow checks that config exports unchanged, that update
+  hooks leave no unexported config, and (with `drupal/config_inspector`)
+  that config matches its schema
 - [PR-159](https://github.com/itk-dev/devops_itkdev-docker/pull/159) - 2026-10-26 -
   Switched the Drupal and Symfony templates to `nginx/nginx-unprivileged`,
   as `nginxinc/nginx-unprivileged` is no longer maintained
