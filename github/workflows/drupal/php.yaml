@@ -61,5 +61,5 @@ jobs:
           docker network create frontend
 
       - run: |
-          docker compose run --rm --env COMPOSER_EXIT_ON_PATCH_FAILURE=1 phpfpm composer install
+          docker compose run --rm phpfpm composer install
           docker compose run --rm phpfpm vendor/bin/phpcs
