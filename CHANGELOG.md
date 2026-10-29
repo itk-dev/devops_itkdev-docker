@@ -6,6 +6,9 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-161](https://github.com/itk-dev/devops_itkdev-docker/pull/161) - 2026-10-29 -
+  Fixed `itkdev-docker-compose` exiting before running any command when
+  `TERM` is unset, such as in CI, cron and `task` runs
 - [PR-159](https://github.com/itk-dev/devops_itkdev-docker/pull/159) - 2026-10-26 -
   Switched the Drupal and Symfony templates to `nginx/nginx-unprivileged`,
   as `nginxinc/nginx-unprivileged` is no longer maintained
