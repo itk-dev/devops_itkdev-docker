@@ -7,7 +7,8 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 ## Open PR's
 
 - [PR-162](https://github.com/itk-dev/devops_itkdev-docker/pull/162) - 2026-11-02 -
-  Switched the Drupal, Symfony and Drupal module templates to PHP 8.5
+  Switched the Drupal, Symfony and Drupal module templates to PHP 8.5. The
+  `drupal-10` template stays on PHP 8.4, as Drupal 10 does not support 8.5
 - [PR-159](https://github.com/itk-dev/devops_itkdev-docker/pull/159) - 2026-10-26 -
   Switched the Drupal and Symfony templates to `nginx/nginx-unprivileged`,
   as `nginxinc/nginx-unprivileged` is no longer maintained
