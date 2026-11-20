@@ -7,6 +7,11 @@
 ### Checks that site can be installed and can be updated (from base branch on
 ### pull request).
 ###
+### Also checks that the config in `config/sync` is up to date: the job exports
+### the config of the installed site, and fails if the export changes any file
+### in `config/sync`. To fix it, install the site from config, run `drush
+### config:export` and commit the changes.
+###
 ### #### Assumptions
 ###
 ### 1. A docker compose service named `phpfpm` can be run and `composer` can be
@@ -15,6 +20,7 @@
 ###    services and the default settings match connection credentials for these
 ###    services.
 ### 3. The Drupal site can be installed from existing config.
+### 4. The config sync directory is `config/sync`.
 
 name: Drupal
 
@@ -58,6 +64,14 @@ jobs:
 
           # Install the site from config
           docker compose exec phpfpm vendor/bin/drush site:install --existing-config --yes
+
+      - name: Check that config is up to date
+        run: |
+          # Export the config of the installed site. "git add" also includes new
+          # and deleted files in the diff.
+          docker compose exec phpfpm vendor/bin/drush config:export --yes
+          git add --all config/sync
+          git diff --cached --exit-code config/sync
 
       - name: Show site URL
         run: |
