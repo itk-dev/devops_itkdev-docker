@@ -6,6 +6,10 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-165](https://github.com/itk-dev/devops_itkdev-docker/pull/165) - 2026-11-20 -
+  Drupal `site.yaml` workflow: check that the config in `config/sync` is up to
+  date. The `install-site` job exports the config and fails if the export
+  changes, adds or deletes a file
 - [PR-162](https://github.com/itk-dev/devops_itkdev-docker/pull/162) - 2026-11-02 -
   Switched the Drupal, Symfony and Drupal module templates to PHP 8.5. The
   `drupal-10` template stays on PHP 8.4, as Drupal 10 does not support 8.5
