@@ -6,19 +6,6 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
-<<<<<<< Updated upstream
-- [PR-145](https://github.com/itk-dev/devops_itkdev-docker/pull/145) - 2026-07-08 -
-  Updated GitHub Actions to latest versions (`actions/checkout` to `v7`,
-  `go-task/setup-task` to `v2`) in workflow templates and repository CI
-- [PR-143](https://github.com/itk-dev/devops_itkdev-docker/pull/143) - 2026-06-02 -
-  Fixed `composer audit` action to audit the lock file (`--locked`) for
-  compatibility with the latest Composer
-- [PR-142](https://github.com/itk-dev/devops_itkdev-docker/pull/142) - 2026-05-21 -
-  Add Prettier config for Taskfiles
-=======
-- [PR-166](https://github.com/itk-dev/devops_itkdev-docker/pull/166)
-  Switched to traefik 3.8
->>>>>>> Stashed changes
 - [PR-135](https://github.com/itk-dev/devops_itkdev-docker/pull/135) - 2026-01-29 -
   Add Podman support with dynamic machine detection
 - [PR-126](https://github.com/itk-dev/devops_itkdev-docker/pull/126) - 2026-01-05 -
@@ -34,6 +21,8 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ### 2026
 
+- [PR-166](https://github.com/itk-dev/devops_itkdev-docker/pull/166)
+  Switched to traefik 3.8
 - [PR-162](https://github.com/itk-dev/devops_itkdev-docker/pull/162) - 2026-11-02 -
   Switched the Drupal, Symfony and Drupal module templates to PHP 8.5. The
   `drupal-10` template stays on PHP 8.4, as Drupal 10 does not support 8.5

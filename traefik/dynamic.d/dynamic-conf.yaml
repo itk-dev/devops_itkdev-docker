@@ -1,0 +1,3 @@
+# Mount point only. Inside the Traefik container ../dynamic-conf.yaml is
+# mounted over this file, so edits here have no effect. Edit
+# traefik/dynamic-conf.yaml for shared configuration instead.

@@ -36,4 +36,4 @@ jobs:
           docker network create frontend
 
       - run: |
-          docker compose run --rm prettier 'css/**/*.css' --check
+          docker compose run --rm prettier --no-editorconfig 'css/**/*.css' --check
