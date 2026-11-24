@@ -6,6 +6,8 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-166](https://github.com/itk-dev/devops_itkdev-docker/pull/166)
+  Switched to traefik 3.8
 - [PR-135](https://github.com/itk-dev/devops_itkdev-docker/pull/135) - 2026-01-29 -
   Add Podman support with dynamic machine detection
 - [PR-126](https://github.com/itk-dev/devops_itkdev-docker/pull/126) - 2026-01-05 -
