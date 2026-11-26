@@ -6,6 +6,10 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ## Open PR's
 
+- [PR-163](https://github.com/itk-dev/devops_itkdev-docker/pull/163) - 2026-11-04 -
+  The Drupal and Symfony nginx configs include project-specific server config
+  from `.docker/templates/server.d/*.conf.template`, so project rules survive
+  `template:update`. Move project changes in `default.conf.template` there
 - [PR-135](https://github.com/itk-dev/devops_itkdev-docker/pull/135) - 2026-01-29 -
   Add Podman support with dynamic machine detection
 - [PR-126](https://github.com/itk-dev/devops_itkdev-docker/pull/126) - 2026-01-05 -

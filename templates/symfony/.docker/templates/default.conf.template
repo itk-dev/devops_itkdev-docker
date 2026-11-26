@@ -11,6 +11,9 @@ server {
     real_ip_recursive on;
     real_ip_header X-Forwarded-For;
 
+    # Project-specific server config (.docker/templates/server.d/*.conf.template).
+    include /etc/nginx/conf.d/server.d/*.conf;
+
     location = /cron-metrics {
         # Proxy to supercronic metrics
         proxy_pass http://${NGINX_CRON_METRICS}/metrics;

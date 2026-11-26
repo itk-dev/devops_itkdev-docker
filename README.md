@@ -54,6 +54,18 @@ Run `itkdev-docker-compose template:install drupal-10`, say, to install or updat
 In addition to the docker compose setup for our projects, installing a template will also add GitHib Actions workflow
 files to a project; see [Github Actions templates](docs/github-actions-templates.md) for details.
 
+Updating a template overwrites the template files in the project. Keep project-specific changes in files the template
+does not ship:
+
+- `docker-compose.override.yml` and `docker-compose.server.override.yml` for docker compose
+- `.docker/templates/server.d/*.conf.template` for nginx (Drupal and Symfony templates). These are included in the
+  `server` block, and environment variables are substituted as in `default.conf.template`, e.g.
+
+  ```nginx
+  # .docker/templates/server.d/app-path-prefix.conf.template
+  rewrite ^${APP_PATH_PREFIX}/(.*) /$1 break;
+  ```
+
 ### Docker commands
 
 Start containers: `docker-compose up -d`
