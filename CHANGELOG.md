@@ -10,42 +10,6 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
   The Drupal and Symfony nginx configs include project-specific server config
   from `.docker/templates/server.d/*.conf.template`, so project rules survive
   `template:update`. Move project changes in `default.conf.template` there
-- [PR-162](https://github.com/itk-dev/devops_itkdev-docker/pull/162) - 2026-11-02 -
-  Switched the Drupal, Symfony and Drupal module templates to PHP 8.5. The
-  `drupal-10` template stays on PHP 8.4, as Drupal 10 does not support 8.5
-- [PR-159](https://github.com/itk-dev/devops_itkdev-docker/pull/159) - 2026-10-26 -
-  Switched the Drupal and Symfony templates to `nginx/nginx-unprivileged`,
-  as `nginxinc/nginx-unprivileged` is no longer maintained
-- [PR-157](https://github.com/itk-dev/devops_itkdev-docker/pull/157) - 2026-10-15 -
-  Traefik reads local dynamic config, such as Agent Proxy services and their
-  API keys, from the untracked `traefik/dynamic.d/`, so it can no longer be
-  committed with the shared `traefik/dynamic-conf.yaml`. Move services you
-  added to `dynamic-conf.yaml` into `dynamic.d/`, and run `traefik:start`
-- [PR-155](https://github.com/itk-dev/devops_itkdev-docker/pull/155) - 2026-10-05 -
-  Python template: select the services to lint and test by the label
-  `dk.itkdev.language: python` instead of `dk.itkdev.python: "true"`
-- [PR-154](https://github.com/itk-dev/devops_itkdev-docker/pull/154) - 2026-10-05 -
-  Pass `github.base_ref` to the changelog workflow through `env` instead of
-  interpolating it into the shell command
-- [PR-153](https://github.com/itk-dev/devops_itkdev-docker/pull/153) - 2026-09-29 -
-  Added basic template for python base projects
-- [PR-152](https://github.com/itk-dev/devops_itkdev-docker/pull/152) - 2026-09-15 -
-  Fixed `idc url` returning a malformed URL when a project has more than
-  one Traefik router, which left `idc open` on a blank tab
-- [PR-151](https://github.com/itk-dev/devops_itkdev-docker/pull/151) - 2026-09-14 -
-  Fixed the SSL section of the README: the certificate path read `treafik`,
-  and the `openssl` config path was the Intel Homebrew prefix, so the
-  documented command failed on Apple Silicon
-- [PR-150](https://github.com/itk-dev/devops_itkdev-docker/pull/150) - 2026-09-10 -
-  Told Prettier to ignore EditorConfig files
-- [PR-145](https://github.com/itk-dev/devops_itkdev-docker/pull/145) - 2026-07-08 -
-  Updated GitHub Actions to latest versions (`actions/checkout` to `v7`,
-  `go-task/setup-task` to `v2`) in workflow templates and repository CI
-- [PR-143](https://github.com/itk-dev/devops_itkdev-docker/pull/143) - 2026-06-02 -
-  Fixed `composer audit` action to audit the lock file (`--locked`) for
-  compatibility with the latest Composer
-- [PR-142](https://github.com/itk-dev/devops_itkdev-docker/pull/142) - 2026-05-21 -
-  Add Prettier config for Taskfiles
 - [PR-135](https://github.com/itk-dev/devops_itkdev-docker/pull/135) - 2026-01-29 -
   Add Podman support with dynamic machine detection
 - [PR-126](https://github.com/itk-dev/devops_itkdev-docker/pull/126) - 2026-01-05 -
@@ -56,15 +20,53 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
   Added general `.editorconfig` file
 - [PR-109](https://github.com/itk-dev/devops_itkdev-docker/pull/109) - 2025-05-08 -
   Workflow documentation
-- [PR-40](https://github.com/itk-dev/devops_itkdev-docker/pull/40) - 2020-04-28 -
-  Fixed path to self (`itkdev-docker-compose`)
 
 ## Merged PR's
 
 ### 2026
 
+- [PR-166](https://github.com/itk-dev/devops_itkdev-docker/pull/166)
+  Switched to traefik 3.8
+- [PR-162](https://github.com/itk-dev/devops_itkdev-docker/pull/162) - 2026-11-02 -
+  Switched the Drupal, Symfony and Drupal module templates to PHP 8.5. The
+  `drupal-10` template stays on PHP 8.4, as Drupal 10 does not support 8.5
+- [PR-159](https://github.com/itk-dev/devops_itkdev-docker/pull/159) - 2026-10-26 -
+  Switched the Drupal and Symfony templates to `nginx/nginx-unprivileged`,
+  as `nginxinc/nginx-unprivileged` is no longer maintained
+- [PR-158](https://github.com/itk-dev/devops_itkdev-docker/pull/158) - 2026-10-23 -
+  Added `drupal-module-ddev` template
+- [PR-157](https://github.com/itk-dev/devops_itkdev-docker/pull/157) - 2026-10-20 -
+  Traefik reads local dynamic config, such as Agent Proxy services and their
+  API keys, from the untracked `traefik/dynamic.d/`, so it can no longer be
+  committed with the shared `traefik/dynamic-conf.yaml`. Move services you
+  added to `dynamic-conf.yaml` into `dynamic.d/`, and run `traefik:start`
+- [PR-155](https://github.com/itk-dev/devops_itkdev-docker/pull/155) - 2026-10-05 -
+  Python template: select the services to lint and test by the label
+  `dk.itkdev.language: python` instead of `dk.itkdev.python: "true"`
+- [PR-154](https://github.com/itk-dev/devops_itkdev-docker/pull/154) - 2026-10-05 -
+  Pass `github.base_ref` to the changelog workflow through `env` instead of
+  interpolating it into the shell command
+- [PR-153](https://github.com/itk-dev/devops_itkdev-docker/pull/153) - 2026-09-30 -
+  Added basic template for python base projects
+- [PR-152](https://github.com/itk-dev/devops_itkdev-docker/pull/152) - 2026-09-29 -
+  Fixed `idc url` returning a malformed URL when a project has more than
+  one Traefik router, which left `idc open` on a blank tab
+- [PR-151](https://github.com/itk-dev/devops_itkdev-docker/pull/151) - 2026-09-29 -
+  Fixed the SSL section of the README: the certificate path read `treafik`,
+  and the `openssl` config path was the Intel Homebrew prefix, so the
+  documented command failed on Apple Silicon
+- [PR-150](https://github.com/itk-dev/devops_itkdev-docker/pull/150) - 2026-09-15 -
+  Told Prettier to ignore EditorConfig files
 - [PR-149](https://github.com/itk-dev/devops_itkdev-docker/pull/149) - 2026-08-28 -
   Upgrade traefik to 3.7
+- [PR-145](https://github.com/itk-dev/devops_itkdev-docker/pull/145) - 2026-07-08 -
+  Updated GitHub Actions to latest versions (`actions/checkout` to `v7`,
+  `go-task/setup-task` to `v2`) in workflow templates and repository CI
+- [PR-143](https://github.com/itk-dev/devops_itkdev-docker/pull/143) - 2026-06-02 -
+  Fixed `composer audit` action to audit the lock file (`--locked`) for
+  compatibility with the latest Composer
+- [PR-142](https://github.com/itk-dev/devops_itkdev-docker/pull/142) - 2026-05-26 -
+  Add Prettier config for Taskfiles
 - [PR-141](https://github.com/itk-dev/devops_itkdev-docker/pull/141) - 2026-03-23 -
   Added GitHub Action to validate changelog on PR events. Rebuilt changelog format.
 - [PR-140](https://github.com/itk-dev/devops_itkdev-docker/pull/140) - 2026-03-23 -
