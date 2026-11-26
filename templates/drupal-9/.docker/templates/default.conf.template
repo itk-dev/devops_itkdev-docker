@@ -76,7 +76,23 @@ server {
 
     # Block web access to Drupal's maintenance scripts (update, install, cache
     # rebuild, and authorize). Use drush and composer for these tasks instead.
-    location ~ ^/(update\.php|install\.php|core/(install|rebuild|authorize)\.php)(/|$) {
+    location ^~ /update.php {
+        return 404;
+    }
+
+    location ^~ /install.php {
+        return 404;
+    }
+
+    location ^~ /core/install.php {
+        return 404;
+    }
+
+    location ^~ /core/rebuild.php {
+        return 404;
+    }
+
+    location ^~ /core/authorize.php {
         return 404;
     }
 
