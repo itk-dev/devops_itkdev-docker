@@ -74,7 +74,29 @@ server {
         return 404;
     }
 
-    location ~ '\.php$|^/update.php' {
+    # Block web access to Drupal's maintenance scripts (update, install, cache
+    # rebuild, and authorize). Use drush and composer for these tasks instead.
+    location ^~ /update.php {
+        return 404;
+    }
+
+    location ^~ /install.php {
+        return 404;
+    }
+
+    location ^~ /core/install.php {
+        return 404;
+    }
+
+    location ^~ /core/rebuild.php {
+        return 404;
+    }
+
+    location ^~ /core/authorize.php {
+        return 404;
+    }
+
+    location ~ '\.php$' {
         include fastcgi_params;
 
         fastcgi_buffers 16 32k;
