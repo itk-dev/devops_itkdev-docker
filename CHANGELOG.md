@@ -25,6 +25,8 @@ Changelog", this file is a reverse-chronological list of merged pull requests.
 
 ### 2026
 
+- [PR-167](https://github.com/itk-dev/devops_itkdev-docker/pull/167) - 2026-11-26 -
+  Block web access to Drupal's maintenance scripts.
 - [PR-166](https://github.com/itk-dev/devops_itkdev-docker/pull/166)
   Switched to traefik 3.8
 - [PR-162](https://github.com/itk-dev/devops_itkdev-docker/pull/162) - 2026-11-02 -
